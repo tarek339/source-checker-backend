@@ -12,3 +12,23 @@ export const mongooseErrorHandler = (error: Error) => {
   if (error.errors) errorMessage = Object.values(error.errors)[0].message;
   return errorMessage || error.message;
 };
+
+export interface IPages {
+  title: string;
+  url: string;
+  note: string;
+  isMobileView: boolean;
+}
+
+export interface ISurvey {
+  validUntil: string;
+  anonymousResults: string;
+  freeUserNames: string;
+  selectedSurveysOption: string;
+  selectedResultsOption: string;
+  surveyId: string;
+  surveyNumber: string;
+  surveyPin: string;
+  link: string;
+  pages: IPages[];
+}

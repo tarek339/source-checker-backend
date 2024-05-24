@@ -50,6 +50,12 @@ const surveySchema = new Schema({
         default: false,
         type: Boolean,
       },
+      mobileScreenshot: {
+        type: String,
+      },
+      desktopScreenshot: {
+        type: String,
+      },
     },
   ],
 });

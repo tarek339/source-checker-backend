@@ -1,6 +1,13 @@
 import { Request, Response } from "express";
-import { mongooseErrorHandler, Error } from "../types/interfaces/interfaces";
+import {
+  mongooseErrorHandler,
+  Error,
+  IPages,
+} from "../types/interfaces/interfaces";
 import { Survey } from "../models/survey";
+import { captureScreenshot } from "../lib/screenshot";
+import { uploadFile } from "../lib/upload";
+import { v4 as uuid } from "uuid";
 
 export const createSurvey = async (req: Request, res: Response) => {
   try {
@@ -52,7 +59,30 @@ export const createSurvey = async (req: Request, res: Response) => {
 export const completeSurvey = async (req: Request, res: Response) => {
   try {
     const survey = await Survey.findOne({ surveyId: req.params.surveyId });
+
+    const mobileContent = await captureScreenshot(
+      {
+        width: 425,
+        height: 3000,
+      },
+      req.body.page.url
+    );
+    const desktopContent = await captureScreenshot(
+      {
+        width: 1024,
+        height: 3000,
+      },
+      req.body.page.url
+    );
+
+    const mobileScreenshot = await uploadFile(mobileContent, uuid() + ".jpg");
+    const desktopScreenshot = await uploadFile(desktopContent, uuid() + ".jpg");
+
+    req.body.page.mobileScreenshot = mobileScreenshot;
+    req.body.page.desktopScreenshot = desktopScreenshot;
+
     survey.pages.push(req.body.page);
+
     await survey.save();
 
     res.json({
@@ -60,6 +90,7 @@ export const completeSurvey = async (req: Request, res: Response) => {
       survey,
     });
   } catch (error) {
+    console.log(error);
     res.status(422).json({
       message: mongooseErrorHandler(error as Error),
     });
@@ -67,10 +98,22 @@ export const completeSurvey = async (req: Request, res: Response) => {
 };
 
 export const editSinglePage = async (req: Request, res: Response) => {
-  const survey = await Survey.findById(req.params.id);
-  console.log(survey);
-  // loop find page id and edit isMobile to true or true as requested
-  // res survey
+  try {
+    const survey = await Survey.findById(req.params.id);
+    const foundPage: IPages = survey.pages.find(
+      (page: { _id: string }, i: number) => (page._id = req.body.pageID)
+    );
+    foundPage.isMobileView = req.body.isMobileView;
+    await survey.save();
+    res.json({
+      message: "page view edited successfully",
+      survey,
+    });
+  } catch (error) {
+    res.status(422).json({
+      message: mongooseErrorHandler(error as Error),
+    });
+  }
 };
 
 export const fetchSurvey = async (req: Request, res: Response) => {
