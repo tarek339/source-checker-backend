@@ -17,7 +17,7 @@ app.use("/survey", survey);
 
 setTimeout(() => {
   autoDelete();
-}, (1000 * 60 * 60 * 24) / 2);
+}, 1000 * 60 * 60 * 24);
 
 const connect = async () => {
   try {

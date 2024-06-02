@@ -14,13 +14,15 @@ export const mongooseErrorHandler = (error: Error) => {
 };
 
 export interface IPages {
+  _id: string;
   title: string;
   url: string;
   note: string;
-  isMobileView: boolean;
+  isMobileView: boolean | null;
 }
 
 export interface ISurvey {
+  _id: string;
   validUntil: string;
   anonymousResults: string;
   freeUserNames: string;

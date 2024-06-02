@@ -22,8 +22,6 @@ export const uploadFile = async (file: Buffer, fileName: string) => {
       { expiresIn: 60 * 5 }
     );
 
-    console.log(signedUrl);
-
     await fetch(signedUrl, {
       method: "PUT",
       body: file,

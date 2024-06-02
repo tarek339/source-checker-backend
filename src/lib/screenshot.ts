@@ -1,6 +1,20 @@
 import path from "path";
 import puppeteer from "puppeteer";
 import fs from "fs";
+import { PuppeteerBlocker } from "@cliqz/adblocker-puppeteer";
+import fetch from "cross-fetch";
+const autoconsent = require("@duckduckgo/autoconsent/dist/autoconsent.puppet.js");
+const extraRules = require("@duckduckgo/autoconsent/rules/rules.json");
+
+const consentomatic = extraRules.consentomatic;
+const rules = [
+  ...autoconsent.rules,
+  ...Object.keys(consentomatic).map(
+    (name) =>
+      new autoconsent.ConsentOMaticCMP(`com_${name}`, consentomatic[name])
+  ),
+  ...extraRules.autoconsent.map((spec: any) => autoconsent.createAutoCMP(spec)),
+];
 
 export const captureScreenshot = async (
   size: {
@@ -9,14 +23,33 @@ export const captureScreenshot = async (
   },
   url: string
 ) => {
-  const browser = await puppeteer.launch({
-    // headless: false,
-  });
+  const blocker = await PuppeteerBlocker.fromLists(fetch, [
+    "https://secure.fanboy.co.nz/fanboy-cookiemonster.txt",
+  ]);
+  // better to switch to an internal txt file
+
+  const browser = await puppeteer.launch({ headless: true });
+
   const page = await browser.newPage();
+  await blocker.enableBlockingInPage(page);
 
   await page.setViewport(size);
 
-  await page.goto(`https://12ft.io/${url}`);
+  page.once("load", async () => {
+    const tab = autoconsent.attachToPage(page, url, rules, 10);
+    try {
+      await tab.checked;
+      await tab.doOptIn();
+    } catch (e) {
+      console.warn(`CMP error`, e);
+    }
+  });
+
+  await page.goto(url, {
+    waitUntil: ["load", "domcontentloaded", "networkidle0"],
+  });
+
+  // zoom out before screenshot
 
   await page.screenshot({
     path: "screenshot.jpg",

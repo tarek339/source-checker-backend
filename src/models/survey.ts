@@ -47,7 +47,7 @@ const surveySchema = new Schema({
         type: String,
       },
       isMobileView: {
-        default: false,
+        default: null,
         type: Boolean,
       },
       mobileScreenshot: {

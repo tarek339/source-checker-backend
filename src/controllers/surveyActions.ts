@@ -4,11 +4,11 @@ export const autoDelete = async () => {
   try {
     const surveys = await Survey.find();
     const oldSurveys = surveys.filter((survey) => {
-      const presentDate = new Date();
-      return survey.validUntil === presentDate;
+      const presentDate = new Date().toLocaleDateString();
+      return survey.validUntil.toLocaleDateString() === presentDate;
     });
-    oldSurveys.forEach(async (survey) => {
-      await Survey.deleteOne({ _id: survey._id });
+    oldSurveys.forEach((survey) => {
+      Survey.deleteOne({ _id: survey._id });
     });
   } catch (error) {
     console.log(error);

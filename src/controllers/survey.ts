@@ -26,13 +26,6 @@ export const createSurvey = async (req: Request, res: Response) => {
     survey.link = `https//quellenchecker/${survey._id}.de`;
     await survey.save();
 
-    // const surveys = await Survey.find();
-    // const surveyNumber = surveys.findIndex(
-    //   (survey) => survey.surveyNumber === null
-    // );
-    // if (surveyNumber !== -1) {
-    //   survey.surveyNumber = surveyNumber + 1;
-    // }
     await survey.save();
 
     res.json({
@@ -97,16 +90,16 @@ export const completeSurvey = async (req: Request, res: Response) => {
   }
 };
 
-export const editSinglePage = async (req: Request, res: Response) => {
+export const choosePageView = async (req: Request, res: Response) => {
   try {
     const survey = await Survey.findById(req.params.id);
     const foundPage: IPages = survey.pages.find(
-      (page: { _id: string }, i: number) => (page._id = req.body.pageID)
+      (page: { _id: string }) => String(page._id) === req.body.pageID
     );
     foundPage.isMobileView = req.body.isMobileView;
     await survey.save();
     res.json({
-      message: "page view edited successfully",
+      message: "page view choosed",
       survey,
     });
   } catch (error) {
@@ -114,6 +107,23 @@ export const editSinglePage = async (req: Request, res: Response) => {
       message: mongooseErrorHandler(error as Error),
     });
   }
+};
+
+export const editSinglePage = async (req: Request, res: Response) => {
+  const survey = await Survey.findById(req.params.id);
+
+  const foundPage: IPages = survey.pages.find(
+    (page: any) => String(page._id) === req.body.pageID
+  );
+  foundPage.title = req.body.title;
+  foundPage.url = req.body.url;
+  foundPage.note = req.body.note;
+
+  await survey.save();
+  res.json({
+    message: "page view choosed",
+    survey,
+  });
 };
 
 export const fetchSurvey = async (req: Request, res: Response) => {
@@ -178,6 +188,7 @@ export const deletePage = async (req: Request, res: Response) => {
 
 export const getSurveyProfile = async (req: Request, res: Response) => {
   try {
+    console.log(req.params.id);
     const survey = await Survey.findById(req.params.id);
     res.json(survey);
   } catch (error) {
@@ -187,8 +198,6 @@ export const getSurveyProfile = async (req: Request, res: Response) => {
 
 export const getStudentsSurvey = async (req: Request, res: Response) => {
   try {
-    console.log("first");
-
     const survey = await Survey.findById(req.params.id);
 
     if (!survey) {
@@ -197,6 +206,7 @@ export const getStudentsSurvey = async (req: Request, res: Response) => {
       });
       return;
     }
+    res.json(survey);
   } catch (error) {
     res.status(422).json({
       message: mongooseErrorHandler(error as Error),
