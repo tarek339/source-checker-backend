@@ -1,5 +1,5 @@
 import path from "path";
-import puppeteer from "puppeteer";
+import puppeteer, { Page } from "puppeteer";
 import fs from "fs";
 import { PuppeteerBlocker } from "@cliqz/adblocker-puppeteer";
 import fetch from "cross-fetch";
@@ -26,11 +26,10 @@ export const captureScreenshot = async (
   const blocker = await PuppeteerBlocker.fromLists(fetch, [
     "https://secure.fanboy.co.nz/fanboy-cookiemonster.txt",
   ]);
-  // better to switch to an internal txt file
 
-  const browser = await puppeteer.launch({ headless: true });
+  let browser = await puppeteer.launch({ headless: false });
 
-  const page = await browser.newPage();
+  let page = await browser.newPage();
   await blocker.enableBlockingInPage(page);
 
   await page.setViewport(size);
@@ -41,7 +40,7 @@ export const captureScreenshot = async (
       await tab.checked;
       await tab.doOptIn();
     } catch (e) {
-      console.warn(`CMP error`, e);
+      // console.warn(`CMP error`, e);
     }
   });
 
@@ -55,6 +54,8 @@ export const captureScreenshot = async (
     path: "screenshot.jpg",
   });
 
+  await clearCookies(page);
+
   await browser.close();
 
   const file = path.join(__dirname, "../../screenshot.jpg");
@@ -62,3 +63,28 @@ export const captureScreenshot = async (
 
   return fileContent;
 };
+
+async function clearCookies(page: Page) {
+  try {
+    // Clearing all cookies
+    const cookieNames = await page.evaluate(() => {
+      let cookies: any[] = [];
+      document.cookie.split(";").forEach((cookie) => {
+        const name = cookie.split("=")[0].trim();
+        cookies.push({ name });
+        document.cookie = `${name}=; expires=Thu, 02 Jan 2024 00:00:00 UTC; path=/;`;
+      });
+      return cookies;
+    });
+
+    // Clearing specific cookies
+    await page.deleteCookie(...cookieNames);
+
+    // Cookies have been cleared successfully
+    return true;
+  } catch (error) {
+    // An error occurred while clearing cookies
+    console.error("Error clearing cookies:", error);
+    return false;
+  }
+}

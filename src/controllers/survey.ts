@@ -188,7 +188,6 @@ export const deletePage = async (req: Request, res: Response) => {
 
 export const getSurveyProfile = async (req: Request, res: Response) => {
   try {
-    console.log(req.params.id);
     const survey = await Survey.findById(req.params.id);
     res.json(survey);
   } catch (error) {
