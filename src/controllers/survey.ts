@@ -8,6 +8,9 @@ import { Survey } from "../models/survey";
 import { captureScreenshot } from "../lib/screenshot";
 import { uploadFile } from "../lib/upload";
 import { v4 as uuid } from "uuid";
+import ogs from "open-graph-scraper";
+import { scrapOpenGraph } from "../lib/scrapPpenGraph";
+import { OgObject } from "open-graph-scraper/dist/lib/types";
 
 export const createSurvey = async (req: Request, res: Response) => {
   try {
@@ -50,9 +53,15 @@ export const createSurvey = async (req: Request, res: Response) => {
 };
 
 export const completeSurvey = async (req: Request, res: Response) => {
+  const survey = await Survey.findOne({ surveyId: req.params.surveyId });
+  const encodedUrl = encodeURIComponent(req.body.page.url);
+  const firstURL = `https://opengraph.io/api/1.1/site/${encodedUrl}?app_id=${process
+    .env.OPEN_GRAPH_API!}`;
+  const secondURL = `https://opengraph.io/api/1.1/extract/${encodedUrl}?app_id=${process
+    .env.OPEN_GRAPH_API!}&html_elements=title,h1,h2,h3,h4,p`;
+  let firstURLArr: OgObject = {};
+  let secondURLArr: any[] = [];
   try {
-    const survey = await Survey.findOne({ surveyId: req.params.surveyId });
-
     const mobileContent = await captureScreenshot(
       {
         width: 425,
@@ -67,26 +76,63 @@ export const completeSurvey = async (req: Request, res: Response) => {
       },
       req.body.page.url
     );
-
-    const mobileScreenshot = await uploadFile(mobileContent, uuid() + ".jpg");
-    const desktopScreenshot = await uploadFile(desktopContent, uuid() + ".jpg");
+    const mobileScreenshot = await uploadFile(
+      mobileContent as Buffer,
+      uuid() + ".jpg"
+    );
+    const desktopScreenshot = await uploadFile(
+      desktopContent as Buffer,
+      uuid() + ".jpg"
+    );
 
     req.body.page.mobileScreenshot = mobileScreenshot;
     req.body.page.desktopScreenshot = desktopScreenshot;
 
-    survey.pages.push(req.body.page);
+    try {
+      const options = { url: req.body.page.url };
+      const data = await ogs(options);
+      const { result } = data;
+      req.body.page.openGraph = result;
+    } catch (error) {
+      console.log(error);
+    }
 
+    survey.pages.push(req.body.page);
     await survey.save();
 
     res.json({
-      message: "survey completed",
+      message: "screenshots and open graph data successfully created",
       survey,
     });
   } catch (error) {
-    console.log(error);
-    res.status(422).json({
-      message: mongooseErrorHandler(error as Error),
-    });
+    console.log(
+      "Capture screenshot timeoutError: Navigation timeout of 30000 ms exceeded. Creating open graph data only."
+    );
+    try {
+      try {
+        const options = { url: req.body.page.url };
+        const data = await ogs(options);
+        const { result } = data;
+        req.body.page.openGraph = result;
+      } catch (error) {
+        console.log(error);
+      }
+      survey.pages.push(req.body.page);
+      await survey.save();
+      res.json({
+        message:
+          "Unable to caputure screenshots for this website. Created open graph data only.",
+        survey,
+      });
+    } catch (error) {
+      console.log(
+        "Unable to create screeshots and open graph data. Please try another website!"
+      );
+      res.status(422).json({
+        message:
+          "Unable to create screeshots and open graph data. Please try another website!",
+      });
+    }
   }
 };
 
@@ -97,6 +143,7 @@ export const choosePageView = async (req: Request, res: Response) => {
       (page: { _id: string }) => String(page._id) === req.body.pageID
     );
     foundPage.isMobileView = req.body.isMobileView;
+    foundPage.isOpenGraphView = req.body.openGraphView;
     await survey.save();
     res.json({
       message: "page view choosed",
@@ -107,23 +154,6 @@ export const choosePageView = async (req: Request, res: Response) => {
       message: mongooseErrorHandler(error as Error),
     });
   }
-};
-
-export const editSinglePage = async (req: Request, res: Response) => {
-  const survey = await Survey.findById(req.params.id);
-
-  const foundPage: IPages = survey.pages.find(
-    (page: any) => String(page._id) === req.body.pageID
-  );
-  foundPage.title = req.body.title;
-  foundPage.url = req.body.url;
-  foundPage.note = req.body.note;
-
-  await survey.save();
-  res.json({
-    message: "page view choosed",
-    survey,
-  });
 };
 
 export const fetchSurvey = async (req: Request, res: Response) => {
@@ -189,26 +219,8 @@ export const deletePage = async (req: Request, res: Response) => {
 export const getSurveyProfile = async (req: Request, res: Response) => {
   try {
     const survey = await Survey.findById(req.params.id);
-    res.json(survey);
+    res.json({ survey });
   } catch (error) {
     console.log(error);
-  }
-};
-
-export const getStudentsSurvey = async (req: Request, res: Response) => {
-  try {
-    const survey = await Survey.findById(req.params.id);
-
-    if (!survey) {
-      res.status(401).json({
-        errorMessage: "ID not registered",
-      });
-      return;
-    }
-    res.json(survey);
-  } catch (error) {
-    res.status(422).json({
-      message: mongooseErrorHandler(error as Error),
-    });
   }
 };

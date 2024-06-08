@@ -19,6 +19,8 @@ export interface IPages {
   url: string;
   note: string;
   isMobileView: boolean | null;
+  openGraph: string;
+  isOpenGraphView: boolean;
 }
 
 export interface ISurvey {

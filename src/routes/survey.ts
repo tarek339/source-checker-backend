@@ -5,9 +5,7 @@ import {
   createSurvey,
   deletePage,
   deleteSurvey,
-  editSinglePage,
   fetchSurvey,
-  getStudentsSurvey,
   getSurveyProfile,
 } from "../controllers/survey";
 
@@ -19,6 +17,4 @@ router.delete("/delete/:id", deleteSurvey);
 router.put("/complete/:surveyId", completeSurvey);
 router.post("/delete-page/:id", deletePage);
 router.get("/get-profile/:id", getSurveyProfile);
-router.post("/students-survey", getStudentsSurvey);
 router.put("/choose-page-view/:id", choosePageView);
-router.put("/edit-single-page/:id", editSinglePage);

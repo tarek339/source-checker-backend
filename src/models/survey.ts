@@ -50,11 +50,20 @@ const surveySchema = new Schema({
         default: null,
         type: Boolean,
       },
+      isOpenGraphView: {
+        default: false,
+        type: Boolean,
+      },
       mobileScreenshot: {
         type: String,
+        default: "",
       },
       desktopScreenshot: {
         type: String,
+        default: "",
+      },
+      openGraph: {
+        type: JSON,
       },
     },
   ],
