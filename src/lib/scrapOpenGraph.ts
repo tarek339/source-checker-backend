@@ -1,12 +1,10 @@
 import ogs from "open-graph-scraper";
-import { OgObject } from "open-graph-scraper/dist/lib/types";
 
 export const scrapOpenGraph = async (
   // firstURL: string,
   // secondURL: string,
   // secondURLArr: any[]
-  url: string,
-  firstURLArr: OgObject
+  url: string
 ) => {
   try {
     // const firstRes = await fetch(firstURL);
@@ -19,7 +17,7 @@ export const scrapOpenGraph = async (
     const options = { url: url };
     const data = await ogs(options);
     const { result } = data;
-    firstURLArr = result;
+    return result;
   } catch (error) {
     console.log(error);
   }

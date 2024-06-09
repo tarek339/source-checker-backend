@@ -9,7 +9,7 @@ import { captureScreenshot } from "../lib/screenshot";
 import { uploadFile } from "../lib/upload";
 import { v4 as uuid } from "uuid";
 import ogs from "open-graph-scraper";
-import { scrapOpenGraph } from "../lib/scrapPpenGraph";
+import { scrapOpenGraph } from "../lib/scrapOpenGraph";
 import { OgObject } from "open-graph-scraper/dist/lib/types";
 
 export const createSurvey = async (req: Request, res: Response) => {
@@ -88,14 +88,8 @@ export const completeSurvey = async (req: Request, res: Response) => {
     req.body.page.mobileScreenshot = mobileScreenshot;
     req.body.page.desktopScreenshot = desktopScreenshot;
 
-    try {
-      const options = { url: req.body.page.url };
-      const data = await ogs(options);
-      const { result } = data;
-      req.body.page.openGraph = result;
-    } catch (error) {
-      console.log(error);
-    }
+    const openGraphData = await scrapOpenGraph(req.body.page.url);
+    req.body.page.openGraph = openGraphData;
 
     survey.pages.push(req.body.page);
     await survey.save();
