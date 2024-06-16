@@ -21,6 +21,16 @@ export interface IPages {
   isMobileView: boolean | null;
   openGraph: string;
   isOpenGraphView: boolean;
+
+  starsQuantity: number;
+  starsArray: [
+    {
+      _id?: string;
+      studentId: string;
+      userName: string;
+      stars: number;
+    }
+  ];
 }
 
 export interface ISurvey {
@@ -34,5 +44,15 @@ export interface ISurvey {
   surveyNumber: string;
   surveyPin: string;
   link: string;
+  isStarted: boolean;
+  pageNum: number;
   pages: IPages[];
+  studentsQuantity: number;
+}
+
+export interface IStudent {
+  surveyId: string;
+  freeUserName: string;
+  userNumber: number;
+  isNameRegistered: boolean;
 }

@@ -35,6 +35,14 @@ const surveySchema = new Schema({
   link: {
     type: String,
   },
+  isStarted: {
+    type: Boolean,
+    default: false,
+  },
+  pageNum: {
+    type: Number,
+    default: 1,
+  },
   pages: [
     {
       title: {
@@ -65,6 +73,19 @@ const surveySchema = new Schema({
       openGraph: {
         type: JSON,
       },
+      starsArray: [
+        {
+          studentId: {
+            type: String,
+          },
+          userName: {
+            type: String,
+          },
+          stars: {
+            type: Number,
+          },
+        },
+      ],
     },
   ],
 });

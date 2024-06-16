@@ -1,3 +1,4 @@
+import { Student } from "../models/student";
 import { Survey } from "../models/survey";
 
 export const autoDelete = async () => {

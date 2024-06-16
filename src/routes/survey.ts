@@ -6,7 +6,11 @@ import {
   deletePage,
   deleteSurvey,
   fetchSurvey,
+  getStudentPageStars,
   getSurveyProfile,
+  pushStarsToArray,
+  setCurrentPage,
+  setSurveyStatus,
 } from "../controllers/survey";
 
 export const router = express.Router();
@@ -18,3 +22,10 @@ router.put("/complete/:surveyId", completeSurvey);
 router.post("/delete-page/:id", deletePage);
 router.get("/get-profile/:id", getSurveyProfile);
 router.put("/choose-page-view/:id", choosePageView);
+router.post("/set-survey-status/:id", setSurveyStatus);
+router.post("/push-stars/:id", pushStarsToArray);
+router.post("/set-current-page/:id", setCurrentPage);
+router.get(
+  "/get-student-page-stars/:id/:pageId/:studentId",
+  getStudentPageStars
+);
