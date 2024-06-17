@@ -61,6 +61,14 @@ const surveySchema = new mongoose_1.Schema({
     link: {
         type: String,
     },
+    isStarted: {
+        type: Boolean,
+        default: false,
+    },
+    pageNum: {
+        type: Number,
+        default: 1,
+    },
     pages: [
         {
             title: {
@@ -73,9 +81,40 @@ const surveySchema = new mongoose_1.Schema({
                 type: String,
             },
             isMobileView: {
+                default: null,
+                type: Boolean,
+            },
+            isOpenGraphView: {
                 default: false,
                 type: Boolean,
             },
+            mobileScreenshot: {
+                type: String,
+                default: "",
+            },
+            desktopScreenshot: {
+                type: String,
+                default: "",
+            },
+            openGraph: {
+                type: JSON,
+            },
+            starsArray: [
+                {
+                    studentId: {
+                        type: String,
+                    },
+                    userName: {
+                        type: String,
+                    },
+                    userNumber: {
+                        type: String,
+                    },
+                    stars: {
+                        type: Number,
+                    },
+                },
+            ],
         },
     ],
 });

@@ -9,21 +9,27 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.autoDelete = void 0;
-const survey_1 = require("../models/survey");
-const autoDelete = () => __awaiter(void 0, void 0, void 0, function* () {
+exports.clearCookies = void 0;
+const clearCookies = (page) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const surveys = yield survey_1.Survey.find();
-        const oldSurveys = surveys.filter((survey) => {
-            const presentDate = new Date().toLocaleDateString();
-            return survey.validUntil.toLocaleDateString() === presentDate;
+        // Clearing all cookies
+        const cookieNames = yield page.evaluate(() => {
+            let cookies = [];
+            document.cookie.split(";").forEach((cookie) => {
+                const name = cookie.split("=")[0].trim();
+                cookies.push({ name });
+                document.cookie = `${name}=; expires=Thu, 02 Jan 2024 00:00:00 UTC; path=/;`;
+            });
+            return cookies;
         });
-        oldSurveys.forEach((survey) => {
-            survey_1.Survey.deleteOne({ _id: survey._id });
-        });
+        // Clearing specific cookies
+        yield page.deleteCookie(...cookieNames);
+        // Cookies have been cleared successfully
+        return true;
     }
     catch (error) {
-        console.log(error);
+        console.error("Error clearing cookies:", error);
+        return false;
     }
 });
-exports.autoDelete = autoDelete;
+exports.clearCookies = clearCookies;

@@ -8,10 +8,20 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getStudentsSurvey = exports.getSurveyProfile = exports.deletePage = exports.deleteSurvey = exports.fetchSurvey = exports.editSinglePage = exports.completeSurvey = exports.createSurvey = void 0;
+exports.getStudentPageStars = exports.pushStarsToArray = exports.setCurrentPage = exports.setSurveyStatus = exports.getSurveyProfile = exports.deletePage = exports.deleteSurvey = exports.fetchSurvey = exports.choosePageView = exports.completeSurvey = exports.createSurvey = void 0;
 const interfaces_1 = require("../types/interfaces/interfaces");
 const survey_1 = require("../models/survey");
+const screenshot_1 = require("../lib/screenshot");
+const upload_1 = require("../lib/upload");
+const uuid_1 = require("uuid");
+const open_graph_scraper_1 = __importDefault(require("open-graph-scraper"));
+const scrapOpenGraph_1 = require("../lib/scrapOpenGraph");
+const socket_1 = require("../socket");
+const student_1 = require("../models/student");
 const createSurvey = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const survey = new survey_1.Survey({
@@ -25,15 +35,8 @@ const createSurvey = (req, res) => __awaiter(void 0, void 0, void 0, function* (
             surveyNumber: Math.floor(1000 + Math.random() * 9000),
         });
         yield survey_1.Survey.findById(survey._id);
-        survey.link = `https//quellenchecker/${survey._id}.de`;
+        survey.link = `http://localhost:5173/register-student/${survey._id}`;
         yield survey.save();
-        // const surveys = await Survey.find();
-        // const surveyNumber = surveys.findIndex(
-        //   (survey) => survey.surveyNumber === null
-        // );
-        // if (surveyNumber !== -1) {
-        //   survey.surveyNumber = surveyNumber + 1;
-        // }
         yield survey.save();
         res.json({
             message: "survey created",
@@ -58,12 +61,73 @@ const createSurvey = (req, res) => __awaiter(void 0, void 0, void 0, function* (
 });
 exports.createSurvey = createSurvey;
 const completeSurvey = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const survey = yield survey_1.Survey.findOne({ surveyId: req.params.surveyId });
+    const encodedUrl = encodeURIComponent(req.body.page.url);
+    const firstURL = `https://opengraph.io/api/1.1/site/${encodedUrl}?app_id=${process
+        .env.OPEN_GRAPH_API}`;
+    const secondURL = `https://opengraph.io/api/1.1/extract/${encodedUrl}?app_id=${process
+        .env.OPEN_GRAPH_API}&html_elements=title,h1,h2,h3,h4,p`;
+    let firstURLArr = {};
+    let secondURLArr = [];
     try {
-        const survey = yield survey_1.Survey.findOne({ surveyId: req.params.surveyId });
+        const mobileContent = yield (0, screenshot_1.captureScreenshot)({
+            width: 425,
+            height: 3000,
+        }, req.body.page.url);
+        const desktopContent = yield (0, screenshot_1.captureScreenshot)({
+            width: 1024,
+            height: 3000,
+        }, req.body.page.url);
+        const mobileScreenshot = yield (0, upload_1.uploadFile)(mobileContent, (0, uuid_1.v4)() + ".jpg");
+        const desktopScreenshot = yield (0, upload_1.uploadFile)(desktopContent, (0, uuid_1.v4)() + ".jpg");
+        req.body.page.mobileScreenshot = mobileScreenshot;
+        req.body.page.desktopScreenshot = desktopScreenshot;
+        const openGraphData = yield (0, scrapOpenGraph_1.scrapOpenGraph)(req.body.page.url);
+        req.body.page.openGraph = openGraphData;
         survey.pages.push(req.body.page);
         yield survey.save();
         res.json({
-            message: "survey completed",
+            message: "screenshots and open graph data successfully created",
+            survey,
+        });
+    }
+    catch (error) {
+        console.log("Capture screenshot timeoutError: Navigation timeout of 30000 ms exceeded. Creating open graph data only.");
+        try {
+            try {
+                const options = { url: req.body.page.url };
+                const data = yield (0, open_graph_scraper_1.default)(options);
+                const { result } = data;
+                req.body.page.openGraph = result;
+            }
+            catch (error) {
+                console.log(error);
+            }
+            survey.pages.push(req.body.page);
+            yield survey.save();
+            res.json({
+                message: "Unable to caputure screenshots for this website. Created open graph data only.",
+                survey,
+            });
+        }
+        catch (error) {
+            console.log("Unable to create screeshots and open graph data. Please try another website!");
+            res.status(422).json({
+                message: "Unable to create screeshots and open graph data. Please try another website!",
+            });
+        }
+    }
+});
+exports.completeSurvey = completeSurvey;
+const choosePageView = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const survey = yield survey_1.Survey.findById(req.params.id);
+        const foundPage = survey.pages.find((page) => String(page._id) === req.body.pageID);
+        foundPage.isMobileView = req.body.isMobileView;
+        foundPage.isOpenGraphView = req.body.openGraphView;
+        yield survey.save();
+        res.json({
+            message: "page view choosed",
             survey,
         });
     }
@@ -73,14 +137,7 @@ const completeSurvey = (req, res) => __awaiter(void 0, void 0, void 0, function*
         });
     }
 });
-exports.completeSurvey = completeSurvey;
-const editSinglePage = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const survey = yield survey_1.Survey.findById(req.params.id);
-    console.log(survey);
-    // loop find page id and edit isMobile to true or true as requested
-    // res survey
-});
-exports.editSinglePage = editSinglePage;
+exports.choosePageView = choosePageView;
 const fetchSurvey = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const survey = yield survey_1.Survey.findOne({
@@ -141,23 +198,37 @@ exports.deletePage = deletePage;
 const getSurveyProfile = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const survey = yield survey_1.Survey.findById(req.params.id);
-        res.json(survey);
+        if (survey) {
+            socket_1.io === null || socket_1.io === void 0 ? void 0 : socket_1.io.emit("surveyStatusChanged", {
+                surveyId: survey._id,
+                isStarted: survey.isStarted,
+            });
+            socket_1.io === null || socket_1.io === void 0 ? void 0 : socket_1.io.emit("surveyPageNumber", {
+                surveyId: survey._id,
+                pageNum: survey.pageNum,
+            });
+        }
+        res.json({ survey });
     }
     catch (error) {
         console.log(error);
     }
 });
 exports.getSurveyProfile = getSurveyProfile;
-const getStudentsSurvey = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const setSurveyStatus = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        console.log("first");
         const survey = yield survey_1.Survey.findById(req.params.id);
-        if (!survey) {
-            res.status(401).json({
-                errorMessage: "ID not registered",
-            });
-            return;
+        survey.isStarted = req.body.isStarted;
+        if (req.body.pageNum) {
+            survey.pageNum = req.body.pageNum;
         }
+        socket_1.io === null || socket_1.io === void 0 ? void 0 : socket_1.io.emit("surveyStatusChanged", {
+            surveyId: survey._id,
+            isStarted: survey.isStarted,
+        });
+        survey.pageNum = 1;
+        yield survey.save();
+        res.json({ survey });
     }
     catch (error) {
         res.status(422).json({
@@ -165,4 +236,75 @@ const getStudentsSurvey = (req, res) => __awaiter(void 0, void 0, void 0, functi
         });
     }
 });
-exports.getStudentsSurvey = getStudentsSurvey;
+exports.setSurveyStatus = setSurveyStatus;
+const setCurrentPage = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const survey = yield survey_1.Survey.findById(req.params.id);
+        survey.pageNum = req.body.pageNum;
+        socket_1.io === null || socket_1.io === void 0 ? void 0 : socket_1.io.emit("surveyPageNumber", {
+            surveyId: survey._id,
+            pageNum: survey.pageNum,
+        });
+        yield survey.save();
+        res.json({ message: "current page set", survey });
+    }
+    catch (error) {
+        res.status(422).json({
+            message: (0, interfaces_1.mongooseErrorHandler)(error),
+        });
+    }
+});
+exports.setCurrentPage = setCurrentPage;
+const pushStarsToArray = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const survey = yield survey_1.Survey.findById(req.params.id);
+        const student = yield student_1.Student.findById(req.body.studentId);
+        survey.pages.forEach((page) => {
+            if (String(page._id) === req.body.pageId) {
+                const foundEqual = page.starsArray.find((starsObj) => {
+                    return starsObj.studentId === req.body.studentId;
+                });
+                if (!foundEqual) {
+                    page.starsArray.push({
+                        studentId: req.body.studentId,
+                        userName: student.freeUserName,
+                        userNumber: student.userNumber,
+                        stars: req.body.stars,
+                    });
+                }
+            }
+        });
+        yield survey.save();
+        res.json({
+            message: "stars added",
+            survey,
+        });
+    }
+    catch (error) {
+        res.status(422).json({
+            message: (0, interfaces_1.mongooseErrorHandler)(error),
+        });
+    }
+});
+exports.pushStarsToArray = pushStarsToArray;
+const getStudentPageStars = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const survey = yield survey_1.Survey.findById(req.params.id);
+        let studentStars = 0;
+        survey.pages.map((page) => {
+            if (String(page._id) === req.params.pageId) {
+                const findStars = page.starsArray.find((obj) => {
+                    return obj.studentId === req.params.studentId;
+                });
+                studentStars = findStars === null || findStars === void 0 ? void 0 : findStars.stars;
+            }
+        });
+        res.json(studentStars);
+    }
+    catch (error) {
+        res.status(422).json({
+            message: (0, interfaces_1.mongooseErrorHandler)(error),
+        });
+    }
+});
+exports.getStudentPageStars = getStudentPageStars;
