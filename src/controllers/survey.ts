@@ -289,6 +289,7 @@ export const pushStarsToArray = async (req: Request, res: Response) => {
           page.starsArray.push({
             studentId: req.body.studentId,
             userName: student.freeUserName,
+            userNumber: student.userNumber,
             stars: req.body.stars,
           });
         }

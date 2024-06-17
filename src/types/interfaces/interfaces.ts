@@ -28,6 +28,7 @@ export interface IPages {
       _id?: string;
       studentId: string;
       userName: string;
+      userNumber: string;
       stars: number;
     }
   ];

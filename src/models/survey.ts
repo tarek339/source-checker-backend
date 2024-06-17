@@ -81,6 +81,9 @@ const surveySchema = new Schema({
           userName: {
             type: String,
           },
+          userNumber: {
+            type: String,
+          },
           stars: {
             type: Number,
           },
