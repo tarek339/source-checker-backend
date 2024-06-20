@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { Student } from "../models/student";
 import { mongooseErrorHandler, Error } from "../types/interfaces/interfaces";
+import { Survey } from "../models/survey";
 
 export const registerUserName = async (req: Request, res: Response) => {
   try {
@@ -10,6 +11,17 @@ export const registerUserName = async (req: Request, res: Response) => {
       userNumber: Math.floor(1000 + Math.random() * 9000),
       isNameRegistered: true,
     });
+
+    const studentExists = await Student.findOne({
+      freeUserName: req.body.freeUserName.toLowerCase(),
+    });
+    if (studentExists) {
+      res.status(401).json({
+        errorMessage: "student allready exists",
+      });
+      return;
+    }
+
     await student.save();
 
     res.json({ message: "user name created", student });
@@ -36,6 +48,27 @@ export const fetchStudents = async (req: Request, res: Response) => {
     const students = await Student.find({ surveyId: req.params.id });
 
     res.json({ students });
+  } catch (error) {
+    res.status(422).json({
+      message: mongooseErrorHandler(error as Error),
+    });
+  }
+};
+
+export const fetchStudentSurvey = async (req: Request, res: Response) => {
+  try {
+    const survey = await Survey.findOne({ surveyId: req.body.surveyId });
+
+    if (!survey) {
+      res.status(401).json({
+        errorMessage: "Wrong ID",
+      });
+      return;
+    }
+
+    res.json({
+      survey,
+    });
   } catch (error) {
     res.status(422).json({
       message: mongooseErrorHandler(error as Error),
