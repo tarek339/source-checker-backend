@@ -7,7 +7,10 @@ export const registerUserName = async (req: Request, res: Response) => {
   try {
     const student = new Student({
       surveyId: req.body.surveyId,
-      freeUserName: req.body.freeUserName,
+      freeUserName:
+        req.body.freeUserName === ""
+          ? null
+          : req.body.freeUserName.toLowerCase(),
       userNumber: Math.floor(1000 + Math.random() * 9000),
       isNameRegistered: true,
     });
@@ -16,6 +19,7 @@ export const registerUserName = async (req: Request, res: Response) => {
       freeUserName: req.body.freeUserName.toLowerCase(),
     });
     if (studentExists) {
+      console.log(studentExists);
       res.status(401).json({
         errorMessage: "student allready exists",
       });
