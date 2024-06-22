@@ -67,14 +67,14 @@ export const completeSurvey = async (req: Request, res: Response) => {
     const mobileContent = await captureScreenshot(
       {
         width: 425,
-        height: 3000,
+        height: 1000,
       },
       req.body.page.url
     );
     const desktopContent = await captureScreenshot(
       {
         width: 1024,
-        height: 3000,
+        height: 1300,
       },
       req.body.page.url
     );

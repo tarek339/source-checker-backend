@@ -19,7 +19,6 @@ export const registerUserName = async (req: Request, res: Response) => {
       freeUserName: req.body.freeUserName.toLowerCase(),
     });
     if (studentExists) {
-      console.log(studentExists);
       res.status(401).json({
         errorMessage: "student allready exists",
       });
