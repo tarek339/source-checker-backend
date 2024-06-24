@@ -72,11 +72,11 @@ const completeSurvey = (req, res) => __awaiter(void 0, void 0, void 0, function*
     try {
         const mobileContent = yield (0, screenshot_1.captureScreenshot)({
             width: 425,
-            height: 3000,
+            height: 1000,
         }, req.body.page.url);
         const desktopContent = yield (0, screenshot_1.captureScreenshot)({
             width: 1024,
-            height: 3000,
+            height: 1300,
         }, req.body.page.url);
         const mobileScreenshot = yield (0, upload_1.uploadFile)(mobileContent, (0, uuid_1.v4)() + ".jpg");
         const desktopScreenshot = yield (0, upload_1.uploadFile)(desktopContent, (0, uuid_1.v4)() + ".jpg");

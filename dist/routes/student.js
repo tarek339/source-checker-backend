@@ -10,3 +10,4 @@ exports.router = express_1.default.Router();
 exports.router.post("/register-free-user-name", student_1.registerUserName);
 exports.router.get("/fetch-students/:id", student_1.fetchStudents);
 exports.router.get("/fetch-single-student/:studentId", student_1.fetchSingleStudent);
+exports.router.post("/student-join-survey", student_1.fetchStudentSurvey);

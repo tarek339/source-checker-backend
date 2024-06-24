@@ -9,17 +9,29 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.fetchStudents = exports.fetchSingleStudent = exports.registerUserName = void 0;
+exports.fetchStudentSurvey = exports.fetchStudents = exports.fetchSingleStudent = exports.registerUserName = void 0;
 const student_1 = require("../models/student");
 const interfaces_1 = require("../types/interfaces/interfaces");
+const survey_1 = require("../models/survey");
 const registerUserName = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const student = new student_1.Student({
             surveyId: req.body.surveyId,
-            freeUserName: req.body.freeUserName,
+            freeUserName: req.body.freeUserName === ""
+                ? null
+                : req.body.freeUserName.toLowerCase(),
             userNumber: Math.floor(1000 + Math.random() * 9000),
             isNameRegistered: true,
         });
+        const studentExists = yield student_1.Student.findOne({
+            freeUserName: req.body.freeUserName.toLowerCase(),
+        });
+        if (studentExists) {
+            res.status(401).json({
+                errorMessage: "student allready exists",
+            });
+            return;
+        }
         yield student.save();
         res.json({ message: "user name created", student });
     }
@@ -54,3 +66,23 @@ const fetchStudents = (req, res) => __awaiter(void 0, void 0, void 0, function* 
     }
 });
 exports.fetchStudents = fetchStudents;
+const fetchStudentSurvey = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const survey = yield survey_1.Survey.findOne({ surveyId: req.body.surveyId });
+        if (!survey) {
+            res.status(401).json({
+                errorMessage: "Wrong ID",
+            });
+            return;
+        }
+        res.json({
+            survey,
+        });
+    }
+    catch (error) {
+        res.status(422).json({
+            message: (0, interfaces_1.mongooseErrorHandler)(error),
+        });
+    }
+});
+exports.fetchStudentSurvey = fetchStudentSurvey;
