@@ -6,11 +6,10 @@ import {
 } from "../types/interfaces/interfaces";
 import { Survey } from "../models/survey";
 import { captureScreenshot } from "../lib/screenshot";
-import { uploadFile } from "../lib/upload";
+import { uploadImg } from "../lib/upload";
 import { v4 as uuid } from "uuid";
-import ogs from "open-graph-scraper";
+
 import { scrapOpenGraph } from "../lib/scrapOpenGraph";
-import { OgObject } from "open-graph-scraper/dist/lib/types";
 import { io } from "../socket";
 import { Student } from "../models/student";
 
@@ -56,13 +55,6 @@ export const createSurvey = async (req: Request, res: Response) => {
 
 export const completeSurvey = async (req: Request, res: Response) => {
   const survey = await Survey.findOne({ surveyId: req.params.surveyId });
-  const encodedUrl = encodeURIComponent(req.body.page.url);
-  const firstURL = `https://opengraph.io/api/1.1/site/${encodedUrl}?app_id=${process
-    .env.OPEN_GRAPH_API!}`;
-  const secondURL = `https://opengraph.io/api/1.1/extract/${encodedUrl}?app_id=${process
-    .env.OPEN_GRAPH_API!}&html_elements=title,h1,h2,h3,h4,p`;
-  let firstURLArr: OgObject = {};
-  let secondURLArr: any[] = [];
   try {
     const mobileContent = await captureScreenshot(
       {
@@ -78,11 +70,12 @@ export const completeSurvey = async (req: Request, res: Response) => {
       },
       req.body.page.url
     );
-    const mobileScreenshot = await uploadFile(
+
+    const mobileScreenshot = uploadImg(
       mobileContent as Buffer,
       uuid() + ".jpg"
     );
-    const desktopScreenshot = await uploadFile(
+    const desktopScreenshot = uploadImg(
       desktopContent as Buffer,
       uuid() + ".jpg"
     );
@@ -105,14 +98,8 @@ export const completeSurvey = async (req: Request, res: Response) => {
       "Capture screenshot timeoutError: Navigation timeout of 30000 ms exceeded. Creating open graph data only."
     );
     try {
-      try {
-        const options = { url: req.body.page.url };
-        const data = await ogs(options);
-        const { result } = data;
-        req.body.page.openGraph = result;
-      } catch (error) {
-        console.log(error);
-      }
+      const openGraphData = await scrapOpenGraph(req.body.page.url);
+      req.body.page.openGraph = openGraphData;
       survey.pages.push(req.body.page);
       await survey.save();
       res.json({
