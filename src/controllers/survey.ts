@@ -81,10 +81,10 @@ export const completeSurvey = async (req: Request, res: Response) => {
     );
 
     req.body.page.mobileScreenshot = mobileScreenshot
-      .replace("/Users/tarekjassine/Desktop/Screenshots/", "")
+      .replace(process.env.ROOT_TO_Directory!, "")
       .replace("-", "/");
     req.body.page.desktopScreenshot = desktopScreenshot
-      .replace("/Users/tarekjassine/Desktop/Screenshots/", "")
+      .replace(process.env.ROOT_TO_Directory!, "")
       .replace("-", "/");
 
     const openGraphData = await scrapOpenGraph(req.body.page.url);
