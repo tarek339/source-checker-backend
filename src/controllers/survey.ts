@@ -80,8 +80,12 @@ export const completeSurvey = async (req: Request, res: Response) => {
       uuid() + ".jpg"
     );
 
-    req.body.page.mobileScreenshot = mobileScreenshot;
-    req.body.page.desktopScreenshot = desktopScreenshot;
+    req.body.page.mobileScreenshot = mobileScreenshot
+      .replace("/Users/tarekjassine/Desktop/Screenshots/", "")
+      .replace("-", "/");
+    req.body.page.desktopScreenshot = desktopScreenshot
+      .replace("/Users/tarekjassine/Desktop/Screenshots/", "")
+      .replace("-", "/");
 
     const openGraphData = await scrapOpenGraph(req.body.page.url);
     req.body.page.openGraph = openGraphData;

@@ -3,7 +3,7 @@ require("dotenv").config();
 
 export const uploadImg = (img: Buffer, imgName: string) => {
   const screenshot = process.env.WEB_SERVER_URL + "-" + imgName;
-  const filePath = `/Root/to/Directory/${screenshot}`;
+  const filePath = `/Users/tarekjassine/Desktop/Screenshots/${screenshot}`;
   fs.writeFileSync(filePath, img);
 
   return filePath;
