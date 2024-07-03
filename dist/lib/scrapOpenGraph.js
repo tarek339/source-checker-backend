@@ -14,18 +14,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.scrapOpenGraph = void 0;
 const open_graph_scraper_1 = __importDefault(require("open-graph-scraper"));
-const scrapOpenGraph = (
-// firstURL: string,
-// secondURL: string,
-// secondURLArr: any[]
-url) => __awaiter(void 0, void 0, void 0, function* () {
+const scrapOpenGraph = (url) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        // const firstRes = await fetch(firstURL);
-        // const firstData = await firstRes.json();
-        // firstURLArr.push(firstData);
-        // const secondRes = await fetch(secondURL);
-        // const secondData = await secondRes.json();
-        // secondURLArr.push(secondData);
         const options = { url: url };
         const data = yield (0, open_graph_scraper_1.default)(options);
         const { result } = data;

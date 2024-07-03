@@ -8,9 +8,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getStudentPageStars = exports.pushStarsToArray = exports.setCurrentPage = exports.setSurveyStatus = exports.getSurveyProfile = exports.deletePage = exports.deleteSurvey = exports.fetchSurvey = exports.choosePageView = exports.completeSurvey = exports.createSurvey = void 0;
 const interfaces_1 = require("../types/interfaces/interfaces");
@@ -18,7 +15,6 @@ const survey_1 = require("../models/survey");
 const screenshot_1 = require("../lib/screenshot");
 const upload_1 = require("../lib/upload");
 const uuid_1 = require("uuid");
-const open_graph_scraper_1 = __importDefault(require("open-graph-scraper"));
 const scrapOpenGraph_1 = require("../lib/scrapOpenGraph");
 const socket_1 = require("../socket");
 const student_1 = require("../models/student");
@@ -62,13 +58,6 @@ const createSurvey = (req, res) => __awaiter(void 0, void 0, void 0, function* (
 exports.createSurvey = createSurvey;
 const completeSurvey = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const survey = yield survey_1.Survey.findOne({ surveyId: req.params.surveyId });
-    const encodedUrl = encodeURIComponent(req.body.page.url);
-    const firstURL = `https://opengraph.io/api/1.1/site/${encodedUrl}?app_id=${process
-        .env.OPEN_GRAPH_API}`;
-    const secondURL = `https://opengraph.io/api/1.1/extract/${encodedUrl}?app_id=${process
-        .env.OPEN_GRAPH_API}&html_elements=title,h1,h2,h3,h4,p`;
-    let firstURLArr = {};
-    let secondURLArr = [];
     try {
         const mobileContent = yield (0, screenshot_1.captureScreenshot)({
             width: 425,
@@ -78,8 +67,8 @@ const completeSurvey = (req, res) => __awaiter(void 0, void 0, void 0, function*
             width: 1024,
             height: 1300,
         }, req.body.page.url);
-        const mobileScreenshot = yield (0, upload_1.uploadFile)(mobileContent, (0, uuid_1.v4)() + ".jpg");
-        const desktopScreenshot = yield (0, upload_1.uploadFile)(desktopContent, (0, uuid_1.v4)() + ".jpg");
+        const mobileScreenshot = (0, upload_1.uploadImg)(mobileContent, (0, uuid_1.v4)() + ".jpg");
+        const desktopScreenshot = (0, upload_1.uploadImg)(desktopContent, (0, uuid_1.v4)() + ".jpg");
         req.body.page.mobileScreenshot = mobileScreenshot;
         req.body.page.desktopScreenshot = desktopScreenshot;
         const openGraphData = yield (0, scrapOpenGraph_1.scrapOpenGraph)(req.body.page.url);
@@ -94,15 +83,8 @@ const completeSurvey = (req, res) => __awaiter(void 0, void 0, void 0, function*
     catch (error) {
         console.log("Capture screenshot timeoutError: Navigation timeout of 30000 ms exceeded. Creating open graph data only.");
         try {
-            try {
-                const options = { url: req.body.page.url };
-                const data = yield (0, open_graph_scraper_1.default)(options);
-                const { result } = data;
-                req.body.page.openGraph = result;
-            }
-            catch (error) {
-                console.log(error);
-            }
+            const openGraphData = yield (0, scrapOpenGraph_1.scrapOpenGraph)(req.body.page.url);
+            req.body.page.openGraph = openGraphData;
             survey.pages.push(req.body.page);
             yield survey.save();
             res.json({

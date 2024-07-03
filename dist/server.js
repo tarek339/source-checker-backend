@@ -37,6 +37,7 @@ app.use("/survey", survey_1.router);
 app.use("/student", student_1.router);
 setInterval(() => {
     (0, surveyActions_1.autoDelete)();
+    (0, surveyActions_1.deleteImages)();
 }, 1000 * 60 * 60 * 24);
 app.get("/", (req, res) => {
     res.send("Backend and DB connected");
