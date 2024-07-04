@@ -7,9 +7,11 @@ exports.uploadImg = void 0;
 const fs_1 = __importDefault(require("fs"));
 require("dotenv").config();
 const uploadImg = (img, imgName) => {
-    const screenshot = process.env.WEB_SERVER_URL + "/" + imgName;
-    const filePath = `/Root/to/Directory/${screenshot}`;
-    fs_1.default.writeFileSync(filePath, img);
+    const screenshot = process.env.WEB_SERVER_URL + "-" + imgName;
+    const filePath = process.env.ROOT_TO_DIRECTORY + screenshot;
+    fs_1.default.writeFile(filePath, img, (err) => {
+        console.log(err);
+    });
     return filePath;
 };
 exports.uploadImg = uploadImg;

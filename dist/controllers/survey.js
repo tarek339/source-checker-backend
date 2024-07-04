@@ -31,7 +31,7 @@ const createSurvey = (req, res) => __awaiter(void 0, void 0, void 0, function* (
             surveyNumber: Math.floor(1000 + Math.random() * 9000),
         });
         yield survey_1.Survey.findById(survey._id);
-        survey.link = `http://localhost:5173/register-student/${survey._id}`;
+        survey.link = `${process.env.CLIENT_URL}register-student/${survey._id}`;
         yield survey.save();
         yield survey.save();
         res.json({
@@ -69,8 +69,12 @@ const completeSurvey = (req, res) => __awaiter(void 0, void 0, void 0, function*
         }, req.body.page.url);
         const mobileScreenshot = (0, upload_1.uploadImg)(mobileContent, (0, uuid_1.v4)() + ".jpg");
         const desktopScreenshot = (0, upload_1.uploadImg)(desktopContent, (0, uuid_1.v4)() + ".jpg");
-        req.body.page.mobileScreenshot = mobileScreenshot;
-        req.body.page.desktopScreenshot = desktopScreenshot;
+        req.body.page.mobileScreenshot = mobileScreenshot
+            .replace(process.env.ROOT_TO_DIRECTORY, "")
+            .replace("-", "/");
+        req.body.page.desktopScreenshot = desktopScreenshot
+            .replace(process.env.ROOT_TO_DIRECTORY, "")
+            .replace("-", "/");
         const openGraphData = yield (0, scrapOpenGraph_1.scrapOpenGraph)(req.body.page.url);
         req.body.page.openGraph = openGraphData;
         survey.pages.push(req.body.page);
