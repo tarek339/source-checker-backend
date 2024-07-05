@@ -27,17 +27,14 @@ export const autoDelete = async () => {
 };
 
 export const deleteImages = () => {
-  const fs = require("fs");
-  const path = require("path");
-
-  const filePath = "/Root/to/Directory/";
-  const files = fs.readdirSync(filePath);
-  files.forEach(async (file: Buffer) => {
-    const fullPath = path.join(filePath, file);
+  const filePath = process.env.ROOT_TO_DIRECTORY;
+  const files = fs.readdirSync(filePath!);
+  files.forEach(async (file) => {
+    const fullPath = path.join(filePath!, file);
     const { birthtime } = await fs.promises.stat(fullPath);
     const presentDate = new Date();
     const diffTime = Math.abs(presentDate.getTime() - birthtime.getTime());
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    if (diffDays <= 1) fs.promises.unlink(fullPath);
+    if (diffDays >= 7) fs.promises.unlink(fullPath);
   });
 };
