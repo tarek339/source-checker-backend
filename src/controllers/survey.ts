@@ -80,12 +80,14 @@ export const completeSurvey = async (req: Request, res: Response) => {
       uuid() + ".jpg"
     );
 
-    req.body.page.mobileScreenshot = mobileScreenshot
-      .replace(process.env.ROOT_TO_DIRECTORY!, "")
-      .replace("-", "/");
-    req.body.page.desktopScreenshot = desktopScreenshot
-      .replace(process.env.ROOT_TO_DIRECTORY!, "")
-      .replace("-", "/");
+    req.body.page.mobileScreenshot = mobileScreenshot.replace(
+      process.env.ROOT_TO_DIRECTORY!,
+      process.env.WEB_SERVER_URL! + "/images/"
+    );
+    req.body.page.desktopScreenshot = desktopScreenshot.replace(
+      process.env.ROOT_TO_DIRECTORY!,
+      process.env.WEB_SERVER_URL! + "/images/"
+    );
 
     const openGraphData = await scrapOpenGraph(req.body.page.url);
     req.body.page.openGraph = openGraphData;
