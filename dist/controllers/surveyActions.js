@@ -8,10 +8,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteImages = exports.autoDelete = void 0;
+const path_1 = __importDefault(require("path"));
 const student_1 = require("../models/student");
 const survey_1 = require("../models/survey");
+const fs_1 = __importDefault(require("fs"));
 const autoDelete = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const surveys = yield survey_1.Survey.find();
@@ -33,18 +38,16 @@ const autoDelete = () => __awaiter(void 0, void 0, void 0, function* () {
 });
 exports.autoDelete = autoDelete;
 const deleteImages = () => {
-    const fs = require("fs");
-    const path = require("path");
-    const filePath = "/Root/to/Directory/";
-    const files = fs.readdirSync(filePath);
+    const filePath = process.env.ROOT_TO_DIRECTORY;
+    const files = fs_1.default.readdirSync(filePath);
     files.forEach((file) => __awaiter(void 0, void 0, void 0, function* () {
-        const fullPath = path.join(filePath, file);
-        const { birthtime } = yield fs.promises.stat(fullPath);
+        const fullPath = path_1.default.join(filePath, file);
+        const { birthtime } = yield fs_1.default.promises.stat(fullPath);
         const presentDate = new Date();
         const diffTime = Math.abs(presentDate.getTime() - birthtime.getTime());
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        if (diffDays <= 1)
-            fs.promises.unlink(fullPath);
+        if (diffDays <= 7)
+            fs_1.default.promises.unlink(fullPath);
     }));
 };
 exports.deleteImages = deleteImages;

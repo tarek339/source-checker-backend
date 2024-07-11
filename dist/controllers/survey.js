@@ -165,6 +165,7 @@ const deletePage = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         survey.pages = survey.pages.filter((page, i) => {
             return page._id != req.params.id;
         });
+        survey.pageNum = 1;
         yield survey.save();
         res.json({
             message: "page deleted",

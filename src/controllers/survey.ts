@@ -193,6 +193,8 @@ export const deletePage = async (req: Request, res: Response) => {
       return page._id != req.params.id;
     });
 
+    survey.pageNum = 1;
+
     await survey.save();
 
     res.json({
