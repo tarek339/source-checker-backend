@@ -31,7 +31,7 @@ const createSurvey = (req, res) => __awaiter(void 0, void 0, void 0, function* (
             surveyNumber: Math.floor(1000 + Math.random() * 9000),
         });
         yield survey_1.Survey.findById(survey._id);
-        survey.link = `${process.env.CLIENT_URL}/register-student/${survey._id}`;
+        survey.link = `${process.env.WEB_SERVER_URL}/register-student/${survey._id}`;
         yield survey.save();
         yield survey.save();
         res.json({

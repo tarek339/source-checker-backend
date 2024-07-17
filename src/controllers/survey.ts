@@ -27,7 +27,7 @@ export const createSurvey = async (req: Request, res: Response) => {
     });
 
     await Survey.findById(survey._id);
-    survey.link = `${process.env.CLIENT_URL}/register-student/${survey._id}`;
+    survey.link = `${process.env.WEB_SERVER_URL}/register-student/${survey._id}`;
     await survey.save();
 
     await survey.save();
