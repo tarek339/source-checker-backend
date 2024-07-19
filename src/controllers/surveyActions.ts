@@ -35,6 +35,6 @@ export const deleteImages = () => {
     const presentDate = new Date();
     const diffTime = Math.abs(presentDate.getTime() - birthtime.getTime());
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    if (diffDays >= 7) fs.promises.unlink(fullPath);
+    if (diffDays >= 14) fs.promises.unlink(fullPath);
   });
 };

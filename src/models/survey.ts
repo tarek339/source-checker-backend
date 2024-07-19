@@ -7,7 +7,7 @@ const surveySchema = new Schema({
   },
   validUntil: {
     type: Date,
-    default: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000),
+    default: new Date(new Date().getTime() + 14 * 24 * 60 * 60 * 1000),
   },
   anonymousResults: {
     type: Boolean,
