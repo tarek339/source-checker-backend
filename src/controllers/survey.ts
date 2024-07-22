@@ -56,38 +56,38 @@ export const createSurvey = async (req: Request, res: Response) => {
 export const completeSurvey = async (req: Request, res: Response) => {
   const survey = await Survey.findOne({ surveyId: req.params.surveyId });
   try {
-    // const mobileContent = await captureScreenshot(
-    //   {
-    //     width: 425,
-    //     height: 1000,
-    //   },
-    //   req.body.page.url
-    // );
-    // const desktopContent = await captureScreenshot(
-    //   {
-    //     width: 1024,
-    //     height: 1300,
-    //   },
-    //   req.body.page.url
-    // );
+    const mobileContent = await captureScreenshot(
+      {
+        width: 425,
+        height: 1000,
+      },
+      req.body.page.url
+    );
+    const desktopContent = await captureScreenshot(
+      {
+        width: 1024,
+        height: 1300,
+      },
+      req.body.page.url
+    );
 
-    // const mobileScreenshot = uploadImg(
-    //   mobileContent as Buffer,
-    //   uuid() + ".jpg"
-    // );
-    // const desktopScreenshot = uploadImg(
-    //   desktopContent as Buffer,
-    //   uuid() + ".jpg"
-    // );
+    const mobileScreenshot = uploadImg(
+      mobileContent as Buffer,
+      uuid() + ".jpg"
+    );
+    const desktopScreenshot = uploadImg(
+      desktopContent as Buffer,
+      uuid() + ".jpg"
+    );
 
-    // req.body.page.mobileScreenshot = mobileScreenshot.replace(
-    //   process.env.ROOT_TO_DIRECTORY!,
-    //   process.env.WEB_SERVER_URL! + "/images/"
-    // );
-    // req.body.page.desktopScreenshot = desktopScreenshot.replace(
-    //   process.env.ROOT_TO_DIRECTORY!,
-    //   process.env.WEB_SERVER_URL! + "/images/"
-    // );
+    req.body.page.mobileScreenshot = mobileScreenshot.replace(
+      process.env.ROOT_TO_DIRECTORY!,
+      process.env.WEB_SERVER_URL! + "/images/"
+    );
+    req.body.page.desktopScreenshot = desktopScreenshot.replace(
+      process.env.ROOT_TO_DIRECTORY!,
+      process.env.WEB_SERVER_URL! + "/images/"
+    );
 
     const openGraphData = await scrapOpenGraph(req.body.page.url);
     req.body.page.openGraph = openGraphData;
@@ -104,25 +104,25 @@ export const completeSurvey = async (req: Request, res: Response) => {
       "Capture screenshot timeoutError: Navigation timeout of 30000 ms exceeded. Creating open graph data only."
     );
   }
-  // try {
-  //   const openGraphData = await scrapOpenGraph(req.body.page.url);
-  //   req.body.page.openGraph = openGraphData;
-  //   survey.pages.push(req.body.page);
-  //   await survey.save();
-  //   res.json({
-  //     message:
-  //       "Unable to caputure screenshots for this website. Created open graph data only.",
-  //     survey,
-  //   });
-  // } catch (error) {
-  //   console.log(
-  //     "Unable to create screeshots and open graph data. Please try another website!"
-  //   );
-  //   res.status(422).json({
-  //     message:
-  //       "Unable to create screeshots and open graph data. Please try another website!",
-  //   });
-  // }
+  try {
+    const openGraphData = await scrapOpenGraph(req.body.page.url);
+    req.body.page.openGraph = openGraphData;
+    survey.pages.push(req.body.page);
+    await survey.save();
+    res.json({
+      message:
+        "Unable to caputure screenshots for this website. Created open graph data only.",
+      survey,
+    });
+  } catch (error) {
+    console.log(
+      "Unable to create screeshots and open graph data. Please try another website!"
+    );
+    res.status(422).json({
+      message:
+        "Unable to create screeshots and open graph data. Please try another website!",
+    });
+  }
 };
 
 export const choosePageView = async (req: Request, res: Response) => {
