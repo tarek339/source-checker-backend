@@ -73,9 +73,6 @@ export const completeSurvey = async (req: Request, res: Response) => {
       req.body.page.url
     );
 
-    const filePath = process.env.ROOT_TO_DIRECTORY + "test.txt";
-    fs.writeFileSync(filePath, "test test test");
-
     const mobileScreenshot = uploadImg(
       mobileContent as Buffer,
       uuid() + ".jpg"
@@ -108,7 +105,10 @@ export const completeSurvey = async (req: Request, res: Response) => {
     console.log(
       "Capture screenshot timeoutError: Navigation timeout of 30000 ms exceeded. Creating open graph data only."
     );
+
     try {
+      const filePath = process.env.ROOT_TO_DIRECTORY + "test.txt";
+      fs.writeFileSync(filePath, "test test test");
       const openGraphData = await scrapOpenGraph(req.body.page.url);
       req.body.page.openGraph = openGraphData;
       survey.pages.push(req.body.page);
