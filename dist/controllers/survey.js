@@ -18,6 +18,7 @@ const uuid_1 = require("uuid");
 const scrapOpenGraph_1 = require("../lib/scrapOpenGraph");
 const socket_1 = require("../socket");
 const student_1 = require("../models/student");
+require("dotenv").config();
 const createSurvey = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const survey = new survey_1.Survey({
@@ -82,22 +83,22 @@ const completeSurvey = (req, res) => __awaiter(void 0, void 0, void 0, function*
     }
     catch (error) {
         console.log("Capture screenshot timeoutError: Navigation timeout of 30000 ms exceeded. Creating open graph data only.");
-        try {
-            const openGraphData = yield (0, scrapOpenGraph_1.scrapOpenGraph)(req.body.page.url);
-            req.body.page.openGraph = openGraphData;
-            survey.pages.push(req.body.page);
-            yield survey.save();
-            res.json({
-                message: "Unable to caputure screenshots for this website. Created open graph data only.",
-                survey,
-            });
-        }
-        catch (error) {
-            console.log("Unable to create screeshots and open graph data. Please try another website!");
-            res.status(422).json({
-                message: "Unable to create screeshots and open graph data. Please try another website!",
-            });
-        }
+    }
+    try {
+        const openGraphData = yield (0, scrapOpenGraph_1.scrapOpenGraph)(req.body.page.url);
+        req.body.page.openGraph = openGraphData;
+        survey.pages.push(req.body.page);
+        yield survey.save();
+        res.json({
+            message: "Unable to caputure screenshots for this website. Created open graph data only.",
+            survey,
+        });
+    }
+    catch (error) {
+        console.log("Unable to create screeshots and open graph data. Please try another website!");
+        res.status(422).json({
+            message: "Unable to create screeshots and open graph data. Please try another website!",
+        });
     }
 });
 exports.completeSurvey = completeSurvey;
