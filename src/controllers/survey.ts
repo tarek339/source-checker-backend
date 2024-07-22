@@ -89,8 +89,8 @@ export const completeSurvey = async (req: Request, res: Response) => {
       process.env.WEB_SERVER_URL! + "/images/"
     );
 
-    const openGraphData = await scrapOpenGraph(req.body.page.url);
-    req.body.page.openGraph = openGraphData;
+    // const openGraphData = await scrapOpenGraph(req.body.page.url);
+    // req.body.page.openGraph = openGraphData;
 
     survey.pages.push(req.body.page);
     await survey.save();
