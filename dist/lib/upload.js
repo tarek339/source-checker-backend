@@ -9,9 +9,6 @@ require("dotenv").config();
 const uploadImg = (img, imgName) => {
     const screenshot = imgName;
     const filePath = process.env.ROOT_TO_DIRECTORY + screenshot;
-    console.log("root", process.env.ROOT_TO_DIRECTORY);
-    console.log("sh", screenshot);
-    console.log("path", filePath);
     fs_1.default.writeFile(filePath, img, (err) => {
         console.log(err);
     });
