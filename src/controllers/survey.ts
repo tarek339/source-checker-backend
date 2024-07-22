@@ -8,11 +8,9 @@ import { Survey } from "../models/survey";
 import { captureScreenshot } from "../lib/screenshot";
 import { uploadImg } from "../lib/upload";
 import { v4 as uuid } from "uuid";
-
 import { scrapOpenGraph } from "../lib/scrapOpenGraph";
 import { io } from "../socket";
 import { Student } from "../models/student";
-import fs from "fs";
 require("dotenv").config();
 
 export const createSurvey = async (req: Request, res: Response) => {
@@ -105,10 +103,7 @@ export const completeSurvey = async (req: Request, res: Response) => {
     console.log(
       "Capture screenshot timeoutError: Navigation timeout of 30000 ms exceeded. Creating open graph data only."
     );
-
     try {
-      const filePath = process.env.ROOT_TO_DIRECTORY + "test.txt";
-      fs.writeFileSync(filePath, "test test test");
       const openGraphData = await scrapOpenGraph(req.body.page.url);
       req.body.page.openGraph = openGraphData;
       survey.pages.push(req.body.page);
