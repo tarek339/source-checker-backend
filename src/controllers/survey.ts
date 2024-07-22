@@ -81,11 +81,11 @@ export const completeSurvey = async (req: Request, res: Response) => {
     );
 
     req.body.page.mobileScreenshot = mobileScreenshot.replace(
-      process.env.ROOT_TO_DIRECTORY!,
+      "/var/www/assets/screenshots/",
       process.env.WEB_SERVER_URL! + "/images/"
     );
     req.body.page.desktopScreenshot = desktopScreenshot.replace(
-      process.env.ROOT_TO_DIRECTORY!,
+      "/var/www/assets/screenshots/",
       process.env.WEB_SERVER_URL! + "/images/"
     );
 

@@ -71,6 +71,8 @@ const completeSurvey = (req, res) => __awaiter(void 0, void 0, void 0, function*
         const desktopScreenshot = (0, upload_1.uploadImg)(desktopContent, (0, uuid_1.v4)() + ".jpg");
         req.body.page.mobileScreenshot = mobileScreenshot.replace(process.env.ROOT_TO_DIRECTORY, process.env.WEB_SERVER_URL + "/images/");
         req.body.page.desktopScreenshot = desktopScreenshot.replace(process.env.ROOT_TO_DIRECTORY, process.env.WEB_SERVER_URL + "/images/");
+        console.log(req.body.page.mobileScreenshot);
+        console.log(req.body.page.desktopScreenshot);
         const openGraphData = yield (0, scrapOpenGraph_1.scrapOpenGraph)(req.body.page.url);
         req.body.page.openGraph = openGraphData;
         survey.pages.push(req.body.page);
