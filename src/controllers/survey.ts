@@ -12,6 +12,8 @@ import { v4 as uuid } from "uuid";
 import { scrapOpenGraph } from "../lib/scrapOpenGraph";
 import { io } from "../socket";
 import { Student } from "../models/student";
+import fs from "fs";
+require("dotenv").config();
 
 export const createSurvey = async (req: Request, res: Response) => {
   try {
@@ -70,6 +72,9 @@ export const completeSurvey = async (req: Request, res: Response) => {
       },
       req.body.page.url
     );
+
+    const filePath = process.env.ROOT_TO_DIRECTORY + "test.txt";
+    fs.writeFileSync(filePath, "test test test");
 
     const mobileScreenshot = uploadImg(
       mobileContent as Buffer,
