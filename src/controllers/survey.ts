@@ -56,20 +56,20 @@ export const createSurvey = async (req: Request, res: Response) => {
 export const completeSurvey = async (req: Request, res: Response) => {
   const survey = await Survey.findOne({ surveyId: req.params.surveyId });
   try {
-    const mobileContent = await captureScreenshot(
-      {
-        width: 425,
-        height: 1000,
-      },
-      req.body.page.url
-    );
-    const desktopContent = await captureScreenshot(
-      {
-        width: 1024,
-        height: 1300,
-      },
-      req.body.page.url
-    );
+    // const mobileContent = await captureScreenshot(
+    //   {
+    //     width: 425,
+    //     height: 1000,
+    //   },
+    //   req.body.page.url
+    // );
+    // const desktopContent = await captureScreenshot(
+    //   {
+    //     width: 1024,
+    //     height: 1300,
+    //   },
+    //   req.body.page.url
+    // );
 
     // const mobileScreenshot = uploadImg(
     //   mobileContent as Buffer,
