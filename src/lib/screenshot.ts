@@ -24,24 +24,24 @@ export const captureScreenshot = async (
   },
   url: string
 ) => {
-  // const blocker = await PuppeteerBlocker.fromLists(fetch, [
-  //   "https://secure.fanboy.co.nz/fanboy-cookiemonster.txt",
-  // ]);
+  const blocker = await PuppeteerBlocker.fromLists(fetch, [
+    "https://secure.fanboy.co.nz/fanboy-cookiemonster.txt",
+  ]);
 
-  let browser = await puppeteer.launch({ headless: true });
+  let browser = await puppeteer.launch();
 
   let page = await browser.newPage();
-  // await blocker.enableBlockingInPage(page);
+  await blocker.enableBlockingInPage(page);
 
   await page.setViewport(size);
 
-  // page.once("load", async () => {
-  //   const tab = autoconsent.attachToPage(page, url, rules, 10);
-  //   try {
-  //     await tab.checked;
-  //     await tab.doOptIn();
-  //   } catch (e) {}
-  // });
+  page.once("load", async () => {
+    const tab = autoconsent.attachToPage(page, url, rules, 10);
+    try {
+      await tab.checked;
+      await tab.doOptIn();
+    } catch (e) {}
+  });
 
   await page.goto(url, {
     waitUntil: ["load", "domcontentloaded", "networkidle0"],
