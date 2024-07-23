@@ -28,7 +28,7 @@ export const captureScreenshot = async (
     "https://secure.fanboy.co.nz/fanboy-cookiemonster.txt",
   ]);
 
-  let browser = await puppeteer.launch();
+  let browser = await puppeteer.launch({ headless: true });
 
   let page = await browser.newPage();
   await blocker.enableBlockingInPage(page);
