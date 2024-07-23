@@ -100,26 +100,27 @@ export const completeSurvey = async (req: Request, res: Response) => {
       survey,
     });
   } catch (error) {
-    console.log(error);
-    // try {
-    //   const openGraphData = await scrapOpenGraph(req.body.page.url);
-    //   req.body.page.openGraph = openGraphData;
-    //   survey.pages.push(req.body.page);
-    //   await survey.save();
-    //   res.json({
-    //     message:
-    //       "Unable to caputure screenshots for this website. Created open graph data only.",
-    //     survey,
-    //   });
-    // } catch (error) {
-    //   console.log(
-    //     "Unable to create screeshots and open graph data. Please try another website!"
-    //   );
-    //   res.status(422).json({
-    //     message:
-    //       "Unable to create screeshots and open graph data. Please try another website!",
-    //   });
-    // }
+    console.log("timeoutError", error);
+    try {
+      const openGraphData = await scrapOpenGraph(req.body.page.url);
+      req.body.page.openGraph = openGraphData;
+      survey.pages.push(req.body.page);
+      await survey.save();
+      res.json({
+        message:
+          "Unable to caputure screenshots for this website. Created open graph data only.",
+        survey,
+      });
+    } catch (error) {
+      console.log(
+        "Unable to create screeshots and open graph data. Please try another website!",
+        error
+      );
+      res.status(422).json({
+        message:
+          "Unable to create screeshots and open graph data. Please try another website!",
+      });
+    }
   }
 };
 
