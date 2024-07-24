@@ -20,6 +20,10 @@ const studentSchema = new Schema({
     type: Boolean,
     default: false,
   },
+  participated: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 export const Student =

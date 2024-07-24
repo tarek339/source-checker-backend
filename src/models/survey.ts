@@ -64,26 +64,22 @@ const surveySchema = new Schema({
       },
     },
   ],
+  isStarted: {
+    type: Boolean,
+    default: false,
+  },
+  pageNum: {
+    type: Number,
+    default: 1,
+  },
   passages: [
     {
       createdAt: {
         type: Date,
         default: Date.now,
       },
-      students: [
-        {
-          studentId: {
-            type: String,
-          },
-        },
-      ],
-      isStarted: {
-        type: Boolean,
-        default: false,
-      },
-      pageNum: {
-        type: Number,
-        default: 1,
+      url: {
+        type: String,
       },
       starsArray: [
         {
@@ -101,9 +97,6 @@ const surveySchema = new Schema({
           },
         },
       ],
-      url: {
-        type: String,
-      },
     },
   ],
 });
