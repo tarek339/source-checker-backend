@@ -268,59 +268,54 @@ export const setCurrentPage = async (req: Request, res: Response) => {
 };
 
 export const pushStarsToArray = async (req: Request, res: Response) => {
-  try {
-    const survey = await Survey.findById(req.params.id);
-    const student = await Student.findById(req.body.studentId);
-
-    survey.pages.forEach((page: IPages) => {
-      if (String(page._id) === req.body.pageId) {
-        const foundEqual = page.starsArray.find(
-          (starsObj: { studentId: string; stars: number }) => {
-            return starsObj.studentId === req.body.studentId;
-          }
-        );
-        if (!foundEqual) {
-          page.starsArray.push({
-            studentId: req.body.studentId,
-            userName: student.freeUserName,
-            userNumber: student.userNumber,
-            stars: req.body.stars,
-          });
-        }
-      }
-    });
-
-    await survey.save();
-
-    res.json({
-      message: "stars added",
-      survey,
-    });
-  } catch (error) {
-    res.status(422).json({
-      message: mongooseErrorHandler(error as Error),
-    });
-  }
+  // try {
+  //   const survey = await Survey.findById(req.params.id);
+  //   const student = await Student.findById(req.body.studentId);
+  //   survey.pages.forEach((page: IPages) => {
+  //     if (String(page._id) === req.body.pageId) {
+  //       const foundEqual = page.starsArray.find(
+  //         (starsObj: { studentId: string; stars: number }) => {
+  //           return starsObj.studentId === req.body.studentId;
+  //         }
+  //       );
+  //       if (!foundEqual) {
+  //         page.starsArray.push({
+  //           studentId: req.body.studentId,
+  //           userName: student.freeUserName,
+  //           userNumber: student.userNumber,
+  //           stars: req.body.stars,
+  //         });
+  //       }
+  //     }
+  //   });
+  //   await survey.save();
+  //   res.json({
+  //     message: "stars added",
+  //     survey,
+  //   });
+  // } catch (error) {
+  //   res.status(422).json({
+  //     message: mongooseErrorHandler(error as Error),
+  //   });
+  // }
 };
 
 export const getStudentPageStars = async (req: Request, res: Response) => {
-  try {
-    const survey = await Survey.findById(req.params.id);
-
-    let studentStars: number | undefined = 0;
-    survey.pages.map((page: IPages) => {
-      if (String(page._id) === req.params.pageId) {
-        const findStars = page.starsArray.find((obj) => {
-          return obj.studentId === req.params.studentId;
-        });
-        studentStars = findStars?.stars;
-      }
-    });
-
-    res.json(studentStars);
-  } catch (error) {
-    res.status(422).json({
-      message: mongooseErrorHandler(error as Error),
-    });
-  }
+  // try {
+  //   const survey = await Survey.findById(req.params.id);
+  //   let studentStars: number | undefined = 0;
+  //   survey.pages.map((page: IPages) => {
+  //     if (String(page._id) === req.params.pageId) {
+  //       const findStars = page.starsArray.find((obj) => {
+  //         return obj.studentId === req.params.studentId;
+  //       });
+  //       studentStars = findStars?.stars;
+  //     }
+  //   });
+  //   res.json(studentStars);
+  // } catch (error) {
+  //   res.status(422).json({
+  //     message: mongooseErrorHandler(error as Error),
+  //   });
+  // }
 };

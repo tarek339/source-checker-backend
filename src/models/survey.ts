@@ -26,22 +26,11 @@ const surveySchema = new Schema({
   surveyId: {
     type: String,
   },
-  surveyNumber: {
-    type: Number,
-  },
   surveyPin: {
     type: String,
   },
   link: {
     type: String,
-  },
-  isStarted: {
-    type: Boolean,
-    default: false,
-  },
-  pageNum: {
-    type: Number,
-    default: 1,
   },
   pages: [
     {
@@ -73,6 +62,29 @@ const surveySchema = new Schema({
       openGraph: {
         type: JSON,
       },
+    },
+  ],
+  passages: [
+    {
+      createdAt: {
+        type: Date,
+        default: Date.now,
+      },
+      students: [
+        {
+          studentId: {
+            type: String,
+          },
+        },
+      ],
+      isStarted: {
+        type: Boolean,
+        default: false,
+      },
+      pageNum: {
+        type: Number,
+        default: 1,
+      },
       starsArray: [
         {
           studentId: {
@@ -89,6 +101,9 @@ const surveySchema = new Schema({
           },
         },
       ],
+      url: {
+        type: String,
+      },
     },
   ],
 });
