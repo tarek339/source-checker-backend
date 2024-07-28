@@ -21,18 +21,6 @@ export interface IPages {
   isMobileView: boolean | null;
   openGraph: string;
   isOpenGraphView: boolean;
-}
-
-export interface IPassages {
-  _id: string;
-  createdAt: string;
-  students: [
-    {
-      studentId: string;
-    }
-  ];
-  isStarted: boolean;
-  pageNum: number;
   starsArray: [
     {
       studentId: string;
@@ -41,7 +29,6 @@ export interface IPassages {
       stars: number;
     }
   ];
-  url: string;
 }
 
 export interface ISurvey {
@@ -55,8 +42,9 @@ export interface ISurvey {
   surveyNumber: string;
   surveyPin: string;
   link: string;
+  isStarted: boolean;
+  pageNum: number;
   pages: IPages[];
-  passages: IPassages[];
 }
 
 export interface IStudent {
@@ -64,4 +52,6 @@ export interface IStudent {
   freeUserName: string;
   userNumber: number;
   isNameRegistered: boolean;
+  participated: false;
+  stars: number;
 }

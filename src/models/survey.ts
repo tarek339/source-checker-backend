@@ -32,6 +32,14 @@ const surveySchema = new Schema({
   link: {
     type: String,
   },
+  isStarted: {
+    type: Boolean,
+    default: false,
+  },
+  pageNum: {
+    type: Number,
+    default: 1,
+  },
   pages: [
     {
       title: {
@@ -61,25 +69,6 @@ const surveySchema = new Schema({
       },
       openGraph: {
         type: JSON,
-      },
-    },
-  ],
-  isStarted: {
-    type: Boolean,
-    default: false,
-  },
-  pageNum: {
-    type: Number,
-    default: 1,
-  },
-  passages: [
-    {
-      createdAt: {
-        type: Date,
-        default: Date.now,
-      },
-      url: {
-        type: String,
       },
       starsArray: [
         {
