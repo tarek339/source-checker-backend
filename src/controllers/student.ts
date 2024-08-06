@@ -2,19 +2,10 @@ import { Request, Response } from "express";
 import { Student } from "../models/student";
 import { mongooseErrorHandler, Error } from "../types/interfaces/interfaces";
 import { Survey } from "../models/survey";
+import { io } from "../socket";
 
 export const registerUserName = async (req: Request, res: Response) => {
   try {
-    const student = new Student({
-      surveyId: req.body.surveyId,
-      freeUserName:
-        req.body.freeUserName === ""
-          ? null
-          : req.body.freeUserName.toLowerCase(),
-      userNumber: Math.floor(1000 + Math.random() * 9000),
-      isNameRegistered: true,
-    });
-
     const studentExists = await Student.findOne({
       freeUserName: req.body.freeUserName.toLowerCase(),
     });
@@ -24,6 +15,16 @@ export const registerUserName = async (req: Request, res: Response) => {
       });
       return;
     }
+
+    const student = new Student({
+      surveyId: req.body.surveyId,
+      freeUserName:
+        req.body.freeUserName === ""
+          ? null
+          : req.body.freeUserName.toLowerCase(),
+      userNumber: Math.floor(1000 + Math.random() * 9000),
+      isNameRegistered: true,
+    });
 
     await student.save();
 
@@ -38,6 +39,11 @@ export const registerUserName = async (req: Request, res: Response) => {
 export const fetchSingleStudent = async (req: Request, res: Response) => {
   try {
     const student = await Student.findById(req.params.studentId);
+
+    io?.emit("fetchStudent", {
+      student: student,
+    });
+
     res.json({ student });
   } catch (error) {
     res.status(422).json({
@@ -49,7 +55,9 @@ export const fetchSingleStudent = async (req: Request, res: Response) => {
 export const fetchStudents = async (req: Request, res: Response) => {
   try {
     const students = await Student.find({ surveyId: req.params.id });
-
+    io?.emit("fetchStudents", {
+      students: students,
+    });
     res.json({ students });
   } catch (error) {
     res.status(422).json({

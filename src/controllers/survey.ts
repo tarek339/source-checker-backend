@@ -239,7 +239,19 @@ export const setSurveyStatus = async (req: Request, res: Response) => {
     });
 
     survey.pageNum = 1;
+
+    if (!survey.isStarted) {
+      const students = await Student.find({ surveyId: req.params.id });
+      students.forEach((student) => {
+        if (student.stars > 0) {
+          student.participated = true;
+          student.save();
+        }
+      });
+    }
+
     await survey.save();
+
     res.json({ survey });
   } catch (error) {
     res.status(422).json({
@@ -267,10 +279,13 @@ export const setCurrentPage = async (req: Request, res: Response) => {
   }
 };
 
-export const pushStarsToArray = async (req: Request, res: Response) => {
+export const pushStarsAmount = async (req: Request, res: Response) => {
   try {
     const survey = await Survey.findById(req.params.id);
     const student = await Student.findById(req.body.studentId);
+
+    student.stars = req.body.stars;
+    await student.save();
 
     survey.pages.forEach((page: IPages) => {
       if (String(page._id) === req.body.pageId) {
@@ -291,7 +306,6 @@ export const pushStarsToArray = async (req: Request, res: Response) => {
     });
 
     await survey.save();
-
     res.json({
       message: "stars added",
       survey,
@@ -306,7 +320,6 @@ export const pushStarsToArray = async (req: Request, res: Response) => {
 export const getStudentPageStars = async (req: Request, res: Response) => {
   try {
     const survey = await Survey.findById(req.params.id);
-
     let studentStars: number | undefined = 0;
     survey.pages.map((page: IPages) => {
       if (String(page._id) === req.params.pageId) {
@@ -316,7 +329,6 @@ export const getStudentPageStars = async (req: Request, res: Response) => {
         studentStars = findStars?.stars;
       }
     });
-
     res.json(studentStars);
   } catch (error) {
     res.status(422).json({

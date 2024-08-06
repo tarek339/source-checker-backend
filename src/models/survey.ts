@@ -26,9 +26,6 @@ const surveySchema = new Schema({
   surveyId: {
     type: String,
   },
-  surveyNumber: {
-    type: Number,
-  },
   surveyPin: {
     type: String,
   },
