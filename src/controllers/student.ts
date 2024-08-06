@@ -6,16 +6,6 @@ import { io } from "../socket";
 
 export const registerUserName = async (req: Request, res: Response) => {
   try {
-    const student = new Student({
-      surveyId: req.body.surveyId,
-      freeUserName:
-        req.body.freeUserName === ""
-          ? null
-          : req.body.freeUserName.toLowerCase(),
-      userNumber: Math.floor(1000 + Math.random() * 9000),
-      isNameRegistered: true,
-    });
-
     const studentExists = await Student.findOne({
       freeUserName: req.body.freeUserName.toLowerCase(),
     });
@@ -25,6 +15,16 @@ export const registerUserName = async (req: Request, res: Response) => {
       });
       return;
     }
+
+    const student = new Student({
+      surveyId: req.body.surveyId,
+      freeUserName:
+        req.body.freeUserName === ""
+          ? null
+          : req.body.freeUserName.toLowerCase(),
+      userNumber: Math.floor(1000 + Math.random() * 9000),
+      isNameRegistered: true,
+    });
 
     await student.save();
 
