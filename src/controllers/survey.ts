@@ -11,6 +11,8 @@ import { v4 as uuid } from "uuid";
 import { scrapOpenGraph } from "../lib/scrapOpenGraph";
 import { io } from "../socket";
 import { Student } from "../models/student";
+import fs from "fs";
+import path from "path";
 require("dotenv").config();
 
 export const createSurvey = async (req: Request, res: Response) => {
@@ -170,12 +172,30 @@ export const fetchSurvey = async (req: Request, res: Response) => {
 
 export const deleteSurvey = async (req: Request, res: Response) => {
   try {
-    await Survey.findByIdAndDelete(req.params.id);
-    const survey = await Survey.find();
+    const survey = await Survey.findById(req.params.id);
+
+    survey?.pages.forEach((page: IPages) => {
+      const filePath = process.env.ROOT_TO_DIRECTORY;
+      const files = fs.readdirSync(filePath!);
+      files.forEach(async (file) => {
+        const fullPath = path.join(filePath!, file);
+        if (page.mobileScreenshot.includes(file)) {
+          fs.promises.unlink(fullPath);
+        }
+        if (page.desktopScreenshot.includes(file)) {
+          fs.promises.unlink(fullPath);
+        }
+        await Survey.findByIdAndDelete(req.params.id);
+      });
+    });
+
+    const students = await Student.find({ surveyId: req.params.id });
+    students.forEach(async (student) => {
+      await Student.deleteOne({ _id: student._id });
+    });
 
     res.json({
       message: "survey deleted",
-      survey,
     });
   } catch (err) {
     res.status(422).json({

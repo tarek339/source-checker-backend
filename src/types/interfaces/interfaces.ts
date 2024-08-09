@@ -21,6 +21,8 @@ export interface IPages {
   isMobileView: boolean | null;
   openGraph: string;
   isOpenGraphView: boolean;
+  mobileScreenshot: string;
+  desktopScreenshot: string;
   starsArray: [
     {
       studentId: string;
