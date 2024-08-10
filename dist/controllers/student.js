@@ -13,16 +13,9 @@ exports.fetchStudentSurvey = exports.fetchStudents = exports.fetchSingleStudent 
 const student_1 = require("../models/student");
 const interfaces_1 = require("../types/interfaces/interfaces");
 const survey_1 = require("../models/survey");
+const socket_1 = require("../socket");
 const registerUserName = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const student = new student_1.Student({
-            surveyId: req.body.surveyId,
-            freeUserName: req.body.freeUserName === ""
-                ? null
-                : req.body.freeUserName.toLowerCase(),
-            userNumber: Math.floor(1000 + Math.random() * 9000),
-            isNameRegistered: true,
-        });
         const studentExists = yield student_1.Student.findOne({
             freeUserName: req.body.freeUserName.toLowerCase(),
         });
@@ -32,6 +25,14 @@ const registerUserName = (req, res) => __awaiter(void 0, void 0, void 0, functio
             });
             return;
         }
+        const student = new student_1.Student({
+            surveyId: req.body.surveyId,
+            freeUserName: req.body.freeUserName === ""
+                ? null
+                : req.body.freeUserName.toLowerCase(),
+            userNumber: Math.floor(1000 + Math.random() * 9000),
+            isNameRegistered: true,
+        });
         yield student.save();
         res.json({ message: "user name created", student });
     }
@@ -45,6 +46,9 @@ exports.registerUserName = registerUserName;
 const fetchSingleStudent = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const student = yield student_1.Student.findById(req.params.studentId);
+        socket_1.io === null || socket_1.io === void 0 ? void 0 : socket_1.io.emit("fetchStudent", {
+            student: student,
+        });
         res.json({ student });
     }
     catch (error) {
@@ -57,6 +61,9 @@ exports.fetchSingleStudent = fetchSingleStudent;
 const fetchStudents = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const students = yield student_1.Student.find({ surveyId: req.params.id });
+        socket_1.io === null || socket_1.io === void 0 ? void 0 : socket_1.io.emit("fetchStudents", {
+            students: students,
+        });
         res.json({ students });
     }
     catch (error) {

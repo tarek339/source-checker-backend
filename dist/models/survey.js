@@ -52,9 +52,6 @@ const surveySchema = new mongoose_1.Schema({
     surveyId: {
         type: String,
     },
-    surveyNumber: {
-        type: Number,
-    },
     surveyPin: {
         type: String,
     },

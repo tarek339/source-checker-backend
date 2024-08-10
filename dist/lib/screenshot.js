@@ -31,7 +31,9 @@ const captureScreenshot = (size, url) => __awaiter(void 0, void 0, void 0, funct
     const blocker = yield adblocker_puppeteer_1.PuppeteerBlocker.fromLists(cross_fetch_1.default, [
         "https://secure.fanboy.co.nz/fanboy-cookiemonster.txt",
     ]);
-    let browser = yield puppeteer_1.default.launch({ headless: true });
+    let browser = yield puppeteer_1.default.launch({
+        headless: true,
+    });
     let page = yield browser.newPage();
     yield blocker.enableBlockingInPage(page);
     yield page.setViewport(size);

@@ -46,5 +46,13 @@ const studentSchema = new mongoose_1.Schema({
         type: Boolean,
         default: false,
     },
+    participated: {
+        type: Boolean,
+        default: false,
+    },
+    stars: {
+        type: Number,
+        default: 0,
+    },
 });
 exports.Student = ((_a = mongoose_1.default.models) === null || _a === void 0 ? void 0 : _a.Student) || mongoose_1.default.model("Student", studentSchema);

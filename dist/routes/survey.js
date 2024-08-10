@@ -15,6 +15,6 @@ exports.router.post("/delete-page/:id", survey_1.deletePage);
 exports.router.get("/get-profile/:id", survey_1.getSurveyProfile);
 exports.router.put("/choose-page-view/:id", survey_1.choosePageView);
 exports.router.post("/set-survey-status/:id", survey_1.setSurveyStatus);
-exports.router.post("/push-stars/:id", survey_1.pushStarsToArray);
+exports.router.post("/push-stars/:id", survey_1.pushStarsAmount);
 exports.router.post("/set-current-page/:id", survey_1.setCurrentPage);
 exports.router.get("/get-student-page-stars/:id/:pageId/:studentId", survey_1.getStudentPageStars);

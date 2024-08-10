@@ -8,8 +8,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getStudentPageStars = exports.pushStarsToArray = exports.setCurrentPage = exports.setSurveyStatus = exports.getSurveyProfile = exports.deletePage = exports.deleteSurvey = exports.fetchSurvey = exports.choosePageView = exports.completeSurvey = exports.createSurvey = void 0;
+exports.getStudentPageStars = exports.pushStarsAmount = exports.setCurrentPage = exports.setSurveyStatus = exports.getSurveyProfile = exports.deletePage = exports.deleteSurvey = exports.fetchSurvey = exports.choosePageView = exports.completeSurvey = exports.createSurvey = void 0;
 const interfaces_1 = require("../types/interfaces/interfaces");
 const survey_1 = require("../models/survey");
 const screenshot_1 = require("../lib/screenshot");
@@ -18,6 +21,8 @@ const uuid_1 = require("uuid");
 const scrapOpenGraph_1 = require("../lib/scrapOpenGraph");
 const socket_1 = require("../socket");
 const student_1 = require("../models/student");
+const fs_1 = __importDefault(require("fs"));
+const path_1 = __importDefault(require("path"));
 require("dotenv").config();
 const createSurvey = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -33,7 +38,6 @@ const createSurvey = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         });
         yield survey_1.Survey.findById(survey._id);
         survey.link = `${process.env.WEB_SERVER_URL}/register-student/${survey._id}`;
-        yield survey.save();
         yield survey.save();
         res.json({
             message: "survey created",
@@ -82,7 +86,7 @@ const completeSurvey = (req, res) => __awaiter(void 0, void 0, void 0, function*
         });
     }
     catch (error) {
-        console.log("Capture screenshot timeoutError: Navigation timeout of 30000 ms exceeded. Creating open graph data only.");
+        console.log("timeoutError", error);
         try {
             const openGraphData = yield (0, scrapOpenGraph_1.scrapOpenGraph)(req.body.page.url);
             req.body.page.openGraph = openGraphData;
@@ -94,7 +98,7 @@ const completeSurvey = (req, res) => __awaiter(void 0, void 0, void 0, function*
             });
         }
         catch (error) {
-            console.log("Unable to create screeshots and open graph data. Please try another website!");
+            console.log("Unable to create screeshots and open graph data. Please try another website!", error);
             res.status(422).json({
                 message: "Unable to create screeshots and open graph data. Please try another website!",
             });
@@ -146,11 +150,27 @@ const fetchSurvey = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
 exports.fetchSurvey = fetchSurvey;
 const deleteSurvey = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        yield survey_1.Survey.findByIdAndDelete(req.params.id);
-        const survey = yield survey_1.Survey.find();
+        const survey = yield survey_1.Survey.findById(req.params.id);
+        survey === null || survey === void 0 ? void 0 : survey.pages.forEach((page) => {
+            const filePath = process.env.ROOT_TO_DIRECTORY;
+            const files = fs_1.default.readdirSync(filePath);
+            files.forEach((file) => __awaiter(void 0, void 0, void 0, function* () {
+                const fullPath = path_1.default.join(filePath, file);
+                if (page.mobileScreenshot.includes(file)) {
+                    fs_1.default.promises.unlink(fullPath);
+                }
+                if (page.desktopScreenshot.includes(file)) {
+                    fs_1.default.promises.unlink(fullPath);
+                }
+                yield survey_1.Survey.findByIdAndDelete(req.params.id);
+            }));
+        });
+        const students = yield student_1.Student.find({ surveyId: req.params.id });
+        students.forEach((student) => __awaiter(void 0, void 0, void 0, function* () {
+            yield student_1.Student.deleteOne({ _id: student._id });
+        }));
         res.json({
             message: "survey deleted",
-            survey,
         });
     }
     catch (err) {
@@ -211,6 +231,15 @@ const setSurveyStatus = (req, res) => __awaiter(void 0, void 0, void 0, function
             isStarted: survey.isStarted,
         });
         survey.pageNum = 1;
+        if (!survey.isStarted) {
+            const students = yield student_1.Student.find({ surveyId: req.params.id });
+            students.forEach((student) => {
+                if (student.stars > 0) {
+                    student.participated = true;
+                    student.save();
+                }
+            });
+        }
         yield survey.save();
         res.json({ survey });
     }
@@ -239,10 +268,12 @@ const setCurrentPage = (req, res) => __awaiter(void 0, void 0, void 0, function*
     }
 });
 exports.setCurrentPage = setCurrentPage;
-const pushStarsToArray = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const pushStarsAmount = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const survey = yield survey_1.Survey.findById(req.params.id);
         const student = yield student_1.Student.findById(req.body.studentId);
+        student.stars = req.body.stars;
+        yield student.save();
         survey.pages.forEach((page) => {
             if (String(page._id) === req.body.pageId) {
                 const foundEqual = page.starsArray.find((starsObj) => {
@@ -270,7 +301,7 @@ const pushStarsToArray = (req, res) => __awaiter(void 0, void 0, void 0, functio
         });
     }
 });
-exports.pushStarsToArray = pushStarsToArray;
+exports.pushStarsAmount = pushStarsAmount;
 const getStudentPageStars = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const survey = yield survey_1.Survey.findById(req.params.id);
