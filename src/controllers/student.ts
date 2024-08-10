@@ -52,6 +52,23 @@ export const fetchSingleStudent = async (req: Request, res: Response) => {
   }
 };
 
+export const fetchStudentStatus = async (req: Request, res: Response) => {
+  try {
+    const student = await Student.findById(req.params.studentId);
+
+    io?.emit("fetchStudentStatus", {
+      stars: student.stars,
+      participated: student.participated,
+    });
+
+    res.json({ stars: student.stars, participated: student.participated });
+  } catch (error) {
+    res.status(422).json({
+      message: mongooseErrorHandler(error as Error),
+    });
+  }
+};
+
 export const fetchStudents = async (req: Request, res: Response) => {
   try {
     const students = await Student.find({ surveyId: req.params.id });
