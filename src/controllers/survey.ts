@@ -260,11 +260,16 @@ export const setSurveyStatus = async (req: Request, res: Response) => {
 
     if (!survey.isStarted) {
       const students = await Student.find({ surveyId: req.params.id });
+      const studentPromise: Promise<any>[] = [];
       students.forEach((student) => {
         if (student.stars > 0) {
           student.participated = true;
-          student.save();
+          studentPromise.push(student.save());
         }
+      });
+      await Promise.all(studentPromise);
+      io?.emit("isStudentUpdated", {
+        isStudentUpdated: true,
       });
     }
 
@@ -304,6 +309,10 @@ export const pushStarsAmount = async (req: Request, res: Response) => {
 
     student.stars = req.body.stars;
     await student.save();
+
+    io?.emit("isStudentUpdated", {
+      isStudentUpdated: true,
+    });
 
     survey.pages.forEach((page: IPages) => {
       if (String(page._id) === req.body.pageId) {

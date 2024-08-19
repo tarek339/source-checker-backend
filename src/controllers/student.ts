@@ -40,10 +40,6 @@ export const fetchSingleStudent = async (req: Request, res: Response) => {
   try {
     const student = await Student.findById(req.params.studentId);
 
-    io?.emit("fetchStudent", {
-      student: student,
-    });
-
     res.json({ student });
   } catch (error) {
     res.status(422).json({
