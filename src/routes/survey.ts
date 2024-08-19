@@ -22,7 +22,7 @@ router.put("/complete/:surveyId", completeSurvey);
 router.post("/delete-page/:id", deletePage);
 router.get("/get-profile/:id", getSurveyProfile);
 router.put("/choose-page-view/:id", choosePageView);
-router.post("/set-survey-status/:id", setSurveyStatus);
+router.put("/set-survey-status/:id", setSurveyStatus);
 router.post("/push-stars/:id", pushStarsAmount);
 router.post("/set-current-page/:id", setCurrentPage);
 router.get(

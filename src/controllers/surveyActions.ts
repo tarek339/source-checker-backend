@@ -9,7 +9,9 @@ export const autoDelete = async () => {
     const presentDate = new Date().toLocaleDateString();
 
     const oldSurveys = surveys.filter((survey) => {
-      return survey.validUntil.toLocaleDateString() === presentDate;
+      if (survey.validUntil !== null) {
+        return survey.validUntil.toLocaleDateString() === presentDate;
+      }
     });
 
     oldSurveys.forEach(async (survey) => {
@@ -35,6 +37,6 @@ export const deleteImages = () => {
     const presentDate = new Date();
     const diffTime = Math.abs(presentDate.getTime() - birthtime.getTime());
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    if (diffDays >= 14) fs.promises.unlink(fullPath);
+    if (diffDays <= 14) fs.promises.unlink(fullPath);
   });
 };

@@ -250,6 +250,9 @@ export const setSurveyStatus = async (req: Request, res: Response) => {
     if (req.body.pageNum) {
       survey.pageNum = req.body.pageNum;
     }
+    if (req.body.expiryDate !== null && !(survey.validUntil instanceof Date)) {
+      survey.validUntil = req.body.expiryDate;
+    }
 
     io?.emit("surveyStatusChanged", {
       surveyId: survey._id,
