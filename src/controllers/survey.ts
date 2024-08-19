@@ -175,7 +175,7 @@ export const deleteSurvey = async (req: Request, res: Response) => {
     survey?.pages.forEach((page: IPages) => {
       const filePath = process.env.ROOT_TO_DIRECTORY;
       const files = fs.readdirSync(filePath!);
-      files.forEach(async (file) => {
+      files.forEach((file) => {
         const fullPath = path.join(filePath!, file);
         if (page.mobileScreenshot.includes(file)) {
           fs.promises.unlink(fullPath);
@@ -183,7 +183,6 @@ export const deleteSurvey = async (req: Request, res: Response) => {
         if (page.desktopScreenshot.includes(file)) {
           fs.promises.unlink(fullPath);
         }
-        await Survey.findByIdAndDelete(req.params.id);
       });
     });
 
@@ -191,6 +190,8 @@ export const deleteSurvey = async (req: Request, res: Response) => {
     students.forEach(async (student) => {
       await Student.deleteOne({ _id: student._id });
     });
+
+    await Survey.findByIdAndDelete(req.params.id);
 
     res.json({
       message: "survey deleted",
