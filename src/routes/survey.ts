@@ -6,12 +6,14 @@ import {
   deletePage,
   deleteSurvey,
   fetchSurvey,
-  getStudentPageStars,
   getSurveyProfile,
+} from "../controllers/survey";
+import {
+  getStudentPageStars,
   pushStarsAmount,
   setCurrentPage,
   setSurveyStatus,
-} from "../controllers/survey";
+} from "../controllers/surveyControl";
 
 export const router = express.Router();
 

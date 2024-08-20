@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getStudentPageStars = exports.pushStarsAmount = exports.setCurrentPage = exports.setSurveyStatus = exports.getSurveyProfile = exports.deletePage = exports.deleteSurvey = exports.fetchSurvey = exports.choosePageView = exports.completeSurvey = exports.createSurvey = void 0;
+exports.getSurveyProfile = exports.deletePage = exports.deleteSurvey = exports.fetchSurvey = exports.choosePageView = exports.completeSurvey = exports.createSurvey = void 0;
 const interfaces_1 = require("../types/interfaces/interfaces");
 const survey_1 = require("../models/survey");
 const screenshot_1 = require("../lib/screenshot");
@@ -154,7 +154,7 @@ const deleteSurvey = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         survey === null || survey === void 0 ? void 0 : survey.pages.forEach((page) => {
             const filePath = process.env.ROOT_TO_DIRECTORY;
             const files = fs_1.default.readdirSync(filePath);
-            files.forEach((file) => __awaiter(void 0, void 0, void 0, function* () {
+            files.forEach((file) => {
                 const fullPath = path_1.default.join(filePath, file);
                 if (page.mobileScreenshot.includes(file)) {
                     fs_1.default.promises.unlink(fullPath);
@@ -162,13 +162,13 @@ const deleteSurvey = (req, res) => __awaiter(void 0, void 0, void 0, function* (
                 if (page.desktopScreenshot.includes(file)) {
                     fs_1.default.promises.unlink(fullPath);
                 }
-                yield survey_1.Survey.findByIdAndDelete(req.params.id);
-            }));
+            });
         });
         const students = yield student_1.Student.find({ surveyId: req.params.id });
         students.forEach((student) => __awaiter(void 0, void 0, void 0, function* () {
             yield student_1.Student.deleteOne({ _id: student._id });
         }));
+        yield survey_1.Survey.findByIdAndDelete(req.params.id);
         res.json({
             message: "survey deleted",
         });
@@ -219,107 +219,3 @@ const getSurveyProfile = (req, res) => __awaiter(void 0, void 0, void 0, functio
     }
 });
 exports.getSurveyProfile = getSurveyProfile;
-const setSurveyStatus = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const survey = yield survey_1.Survey.findById(req.params.id);
-        survey.isStarted = req.body.isStarted;
-        if (req.body.pageNum) {
-            survey.pageNum = req.body.pageNum;
-        }
-        socket_1.io === null || socket_1.io === void 0 ? void 0 : socket_1.io.emit("surveyStatusChanged", {
-            surveyId: survey._id,
-            isStarted: survey.isStarted,
-        });
-        survey.pageNum = 1;
-        if (!survey.isStarted) {
-            const students = yield student_1.Student.find({ surveyId: req.params.id });
-            students.forEach((student) => {
-                if (student.stars > 0) {
-                    student.participated = true;
-                    student.save();
-                }
-            });
-        }
-        yield survey.save();
-        res.json({ survey });
-    }
-    catch (error) {
-        res.status(422).json({
-            message: (0, interfaces_1.mongooseErrorHandler)(error),
-        });
-    }
-});
-exports.setSurveyStatus = setSurveyStatus;
-const setCurrentPage = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const survey = yield survey_1.Survey.findById(req.params.id);
-        survey.pageNum = req.body.pageNum;
-        socket_1.io === null || socket_1.io === void 0 ? void 0 : socket_1.io.emit("surveyPageNumber", {
-            surveyId: survey._id,
-            pageNum: survey.pageNum,
-        });
-        yield survey.save();
-        res.json({ message: "current page set", survey });
-    }
-    catch (error) {
-        res.status(422).json({
-            message: (0, interfaces_1.mongooseErrorHandler)(error),
-        });
-    }
-});
-exports.setCurrentPage = setCurrentPage;
-const pushStarsAmount = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const survey = yield survey_1.Survey.findById(req.params.id);
-        const student = yield student_1.Student.findById(req.body.studentId);
-        student.stars = req.body.stars;
-        yield student.save();
-        survey.pages.forEach((page) => {
-            if (String(page._id) === req.body.pageId) {
-                const foundEqual = page.starsArray.find((starsObj) => {
-                    return starsObj.studentId === req.body.studentId;
-                });
-                if (!foundEqual) {
-                    page.starsArray.push({
-                        studentId: req.body.studentId,
-                        userName: student.freeUserName,
-                        userNumber: student.userNumber,
-                        stars: req.body.stars,
-                    });
-                }
-            }
-        });
-        yield survey.save();
-        res.json({
-            message: "stars added",
-            survey,
-        });
-    }
-    catch (error) {
-        res.status(422).json({
-            message: (0, interfaces_1.mongooseErrorHandler)(error),
-        });
-    }
-});
-exports.pushStarsAmount = pushStarsAmount;
-const getStudentPageStars = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const survey = yield survey_1.Survey.findById(req.params.id);
-        let studentStars = 0;
-        survey.pages.map((page) => {
-            if (String(page._id) === req.params.pageId) {
-                const findStars = page.starsArray.find((obj) => {
-                    return obj.studentId === req.params.studentId;
-                });
-                studentStars = findStars === null || findStars === void 0 ? void 0 : findStars.stars;
-            }
-        });
-        res.json(studentStars);
-    }
-    catch (error) {
-        res.status(422).json({
-            message: (0, interfaces_1.mongooseErrorHandler)(error),
-        });
-    }
-});
-exports.getStudentPageStars = getStudentPageStars;

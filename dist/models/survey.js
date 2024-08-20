@@ -33,7 +33,7 @@ const surveySchema = new mongoose_1.Schema({
     },
     validUntil: {
         type: Date,
-        default: new Date(new Date().getTime() + 14 * 24 * 60 * 60 * 1000),
+        default: null,
     },
     anonymousResults: {
         type: Boolean,

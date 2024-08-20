@@ -22,7 +22,9 @@ const autoDelete = () => __awaiter(void 0, void 0, void 0, function* () {
         const surveys = yield survey_1.Survey.find();
         const presentDate = new Date().toLocaleDateString();
         const oldSurveys = surveys.filter((survey) => {
-            return survey.validUntil.toLocaleDateString() === presentDate;
+            if (survey.validUntil !== null) {
+                return survey.validUntil.toLocaleDateString() === presentDate;
+            }
         });
         oldSurveys.forEach((survey) => __awaiter(void 0, void 0, void 0, function* () {
             const students = yield student_1.Student.find({ surveyId: survey._id });
@@ -46,7 +48,7 @@ const deleteImages = () => {
         const presentDate = new Date();
         const diffTime = Math.abs(presentDate.getTime() - birthtime.getTime());
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        if (diffDays >= 14)
+        if (diffDays <= 14)
             fs_1.default.promises.unlink(fullPath);
     }));
 };
