@@ -7,7 +7,11 @@ const surveySchema = new Schema({
   },
   validUntil: {
     type: Date,
-    default: null,
+    default: () => {
+      const today = new Date();
+      const fourteenDaysLater = new Date(today.setDate(today.getDate() + 14));
+      return fourteenDaysLater;
+    },
   },
   anonymousResults: {
     type: Boolean,

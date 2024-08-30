@@ -26,7 +26,7 @@ const studentSchema = new Schema({
   },
   stars: {
     type: Number,
-    default: 0,
+    default: null,
   },
 });
 

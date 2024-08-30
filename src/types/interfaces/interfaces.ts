@@ -23,14 +23,16 @@ export interface IPages {
   isOpenGraphView: boolean;
   mobileScreenshot: string;
   desktopScreenshot: string;
-  starsArray: [
-    {
-      studentId: string;
-      userName: string;
-      userNumber: string;
-      stars: number;
-    }
-  ];
+  starsArray:
+    | [
+        {
+          studentId: string;
+          userName: string;
+          userNumber: string;
+          stars: number;
+        }
+      ]
+    | any[];
 }
 
 export interface ISurvey {

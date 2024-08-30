@@ -42,6 +42,12 @@ export const setSurveyStatus = async (req: Request, res: Response) => {
       });
     }
 
+    survey.pages.map((page: IPages) => {
+      if (page.starsArray.length > 0 && survey.isStarted) {
+        page.starsArray = [];
+      }
+    });
+
     await survey.save();
 
     res.json({ survey });
