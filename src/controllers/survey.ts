@@ -100,7 +100,7 @@ export const completeSurvey = async (req: Request, res: Response) => {
       survey,
     });
   } catch (error) {
-    console.log("timeoutError", error);
+    console.log("TimeoutError: Navigation timeout of 30000 ms exceeded");
     try {
       const openGraphData = await scrapOpenGraph(req.body.page.url);
       req.body.page.openGraph = openGraphData;

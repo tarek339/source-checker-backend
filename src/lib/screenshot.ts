@@ -4,8 +4,8 @@ import fs from "fs";
 import { PuppeteerBlocker } from "@cliqz/adblocker-puppeteer";
 import fetch from "cross-fetch";
 import { clearCookies } from "./deleteCookies";
-const autoconsent = require("@duckduckgo/autoconsent/dist/autoconsent.puppet.js");
-const extraRules = require("@duckduckgo/autoconsent/rules/rules.json");
+const autoconsent = require("../../autoconsent.puppet.js");
+const extraRules = require("../../rules.json");
 
 const consentomatic = extraRules.consentomatic;
 const rules = [
