@@ -39,19 +39,25 @@ export const captureScreenshot = async (
 
   page.once("load", async () => {
     if (url.includes("https://www.instagram.com")) {
-      const selector = `.x6s0dn4`;
-      console.log("first");
-      await page.waitForSelector(selector, { visible: true });
-      console.log("second");
-      await page.click(selector);
-      console.log("fourth");
+      const instagram = `.x6s0dn4`;
+      await page.waitForSelector(instagram, { visible: true });
+      await page.click(instagram);
+      const tab = autoconsent.attachToPage(page, url, rules, 10);
+      try {
+        await tab.checked;
+        await tab.doOptIn();
+      } catch (e) {}
+    }
+    if (url.includes("https://www.facebook")) {
+      const facebook = ".x92rtbv";
+      await page.waitForSelector(facebook, { visible: true });
+      await page.click(facebook);
       const tab = autoconsent.attachToPage(page, url, rules, 10);
       try {
         await tab.checked;
         await tab.doOptIn();
       } catch (e) {}
     } else {
-      console.log("third");
       const tab = autoconsent.attachToPage(page, url, rules, 10);
       try {
         await tab.checked;
