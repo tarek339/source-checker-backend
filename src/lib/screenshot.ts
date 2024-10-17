@@ -38,10 +38,9 @@ export const captureScreenshot = async (
   await page.setViewport(size);
 
   page.once("load", async () => {
-    console.log(url);
-
     if (url.includes("https://www.instagram.com")) {
-      clickElementByClass("x6s0dn4 x78zum5 xdt5ytf xl56j7k");
+      const selector = `.x1qjc9v5.x9f619.x78zum5.xdt5ytf.x1iyjqo2.xl56j7k`;
+      await page.click(selector);
     } else {
       const tab = autoconsent.attachToPage(page, url, rules, 10);
       try {
@@ -67,13 +66,4 @@ export const captureScreenshot = async (
   const fileContent = fs.readFileSync(file);
 
   return fileContent;
-};
-
-const clickElementByClass = (className: string) => {
-  const element = document.querySelector(`.${className}`);
-  if (element) {
-    (element as HTMLElement).click();
-  } else {
-    console.log(`Element with class ${className} not found.`);
-  }
 };
