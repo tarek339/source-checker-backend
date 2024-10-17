@@ -38,16 +38,16 @@ export const captureScreenshot = async (
   await page.setViewport(size);
 
   page.once("load", async () => {
-    if (url.includes("https://www.instagram.com")) {
-      const selector = `.x1qjc9v5.x9f619.x78zum5.xdt5ytf.x1iyjqo2.xl56j7k`;
-      await page.click(selector);
-    } else {
-      const tab = autoconsent.attachToPage(page, url, rules, 10);
-      try {
-        await tab.checked;
-        await tab.doOptIn();
-      } catch (e) {}
-    }
+    // if (url.includes("https://www.instagram.com")) {
+    //   const selector = `.x1qjc9v5.x9f619.x78zum5.xdt5ytf.x1iyjqo2.xl56j7k`;
+    //   await page.click(selector);
+    // } else {
+    const tab = autoconsent.attachToPage(page, url, rules, 10);
+    try {
+      await tab.checked;
+      await tab.doOptIn();
+    } catch (e) {}
+    // }
   });
 
   await page.goto(url, {
