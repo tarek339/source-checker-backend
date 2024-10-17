@@ -49,7 +49,7 @@ export const captureScreenshot = async (
       } catch (e) {}
     }
     if (url.includes("https://www.facebook")) {
-      const facebook = ".x92rtbv";
+      const facebook = ".x1i10hfl";
       await page.waitForSelector(facebook, { visible: true });
       await page.click(facebook);
       const tab = autoconsent.attachToPage(page, url, rules, 10);
