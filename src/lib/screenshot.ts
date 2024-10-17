@@ -39,9 +39,12 @@ export const captureScreenshot = async (
 
   page.once("load", async () => {
     if (url.includes("https://www.instagram.com")) {
-      const selector = `.x6s0dn4`;
+      const selector = `x6s0dn4`;
       console.log("first");
-      await page.waitForSelector(selector, { visible: true });
+      const wait = await page.waitForSelector(selector, { visible: true });
+      if (wait) {
+        console.log(selector);
+      }
       console.log("second");
       await page.click(selector);
     } else {
