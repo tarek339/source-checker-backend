@@ -40,9 +40,12 @@ export const captureScreenshot = async (
   page.once("load", async () => {
     if (url.includes("https://www.instagram.com")) {
       const selector = `.x1qjc9v5.x9f619.x78zum5.xdt5ytf.x1iyjqo2.xl56j7k`;
+      console.log("first");
       await page.waitForSelector(selector, { visible: true });
+      console.log("second");
       await page.click(selector);
     } else {
+      console.log("third");
       const tab = autoconsent.attachToPage(page, url, rules, 10);
       try {
         await tab.checked;
