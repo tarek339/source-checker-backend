@@ -47,8 +47,7 @@ export const captureScreenshot = async (
         await tab.checked;
         await tab.doOptIn();
       } catch (e) {}
-    }
-    if (url.includes("https://www.facebook")) {
+    } else if (url.includes("https://www.facebook.com")) {
       console.log("facebook");
       const facebook = ".x1i10hfl";
       await page.waitForSelector(facebook, { visible: true });
