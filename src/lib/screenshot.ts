@@ -38,11 +38,17 @@ export const captureScreenshot = async (
   await page.setViewport(size);
 
   page.once("load", async () => {
-    const tab = autoconsent.attachToPage(page, url, rules, 10);
-    try {
-      await tab.checked;
-      await tab.doOptIn();
-    } catch (e) {}
+    console.log(url);
+
+    if (url.includes("https://www.instagram.com")) {
+      clickElementByClass("x6s0dn4 x78zum5 xdt5ytf xl56j7k");
+    } else {
+      const tab = autoconsent.attachToPage(page, url, rules, 10);
+      try {
+        await tab.checked;
+        await tab.doOptIn();
+      } catch (e) {}
+    }
   });
 
   await page.goto(url, {
@@ -61,4 +67,13 @@ export const captureScreenshot = async (
   const fileContent = fs.readFileSync(file);
 
   return fileContent;
+};
+
+const clickElementByClass = (className: string) => {
+  const element = document.querySelector(`.${className}`);
+  if (element) {
+    (element as HTMLElement).click();
+  } else {
+    console.log(`Element with class ${className} not found.`);
+  }
 };
