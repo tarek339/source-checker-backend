@@ -41,9 +41,15 @@ export const captureScreenshot = async (
     if (url.includes("https://www.instagram.com")) {
       const selector = `.x6s0dn4`;
       console.log("first");
-      const wait = await page.waitForSelector(selector, { visible: true });
+      await page.waitForSelector(selector, { visible: true });
       console.log("second");
       await page.click(selector);
+      console.log("fourth");
+      const tab = autoconsent.attachToPage(page, url, rules, 10);
+      try {
+        await tab.checked;
+        await tab.doOptIn();
+      } catch (e) {}
     } else {
       console.log("third");
       const tab = autoconsent.attachToPage(page, url, rules, 10);
