@@ -37,10 +37,6 @@ export const captureScreenshot = async (
 
   await page.setViewport(size);
 
-  await page.goto(url, {
-    waitUntil: ["load", "domcontentloaded", "networkidle0"],
-  });
-
   page.once("load", async () => {
     if (url.includes("https://www.instagram.com")) {
       const selector = `.x6s0dn4`;
@@ -56,6 +52,10 @@ export const captureScreenshot = async (
         await tab.doOptIn();
       } catch (e) {}
     }
+  });
+
+  await page.goto(url, {
+    waitUntil: ["load", "domcontentloaded", "networkidle0"],
   });
 
   await page.screenshot({
