@@ -63,6 +63,10 @@ const surveySchema = new Schema({
         default: false,
         type: Boolean,
       },
+      isSelectedView: {
+        default: false,
+        type: Boolean,
+      },
       mobileScreenshot: {
         type: String,
         default: "",

@@ -3,6 +3,7 @@ import {
   mongooseErrorHandler,
   Error,
   IPages,
+  ISurvey,
 } from "../types/interfaces/interfaces";
 import { Survey } from "../models/survey";
 import { captureScreenshot } from "../lib/screenshot";
@@ -93,6 +94,7 @@ export const completeSurvey = async (req: Request, res: Response) => {
     req.body.page.openGraph = openGraphData;
 
     survey.pages.push(req.body.page);
+
     await survey.save();
 
     res.json({
@@ -127,11 +129,13 @@ export const completeSurvey = async (req: Request, res: Response) => {
 export const choosePageView = async (req: Request, res: Response) => {
   try {
     const survey = await Survey.findById(req.params.id);
+
     const foundPage: IPages = survey.pages.find(
       (page: { _id: string }) => String(page._id) === req.body.pageID
     );
     foundPage.isMobileView = req.body.isMobileView;
     foundPage.isOpenGraphView = req.body.openGraphView;
+    foundPage.isSelectedView = true;
     await survey.save();
     res.json({
       message: "page view choosed",

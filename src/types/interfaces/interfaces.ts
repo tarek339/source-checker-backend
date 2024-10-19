@@ -20,6 +20,7 @@ export interface IPages {
   note: string;
   isMobileView: boolean | null;
   openGraph: string;
+  isSelectedView: boolean;
   isOpenGraphView: boolean;
   mobileScreenshot: string;
   desktopScreenshot: string;
