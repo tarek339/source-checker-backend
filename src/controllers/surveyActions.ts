@@ -14,29 +14,38 @@ export const autoDelete = async () => {
       }
     });
 
-    oldSurveys.forEach(async (survey) => {
+    for (const survey of oldSurveys) {
       const students = await Student.find({ surveyId: survey._id });
 
-      students.forEach(async (student) => {
+      for (const student of students) {
         await Student.deleteOne({ _id: student._id });
-      });
-
+      }
       await Survey.deleteOne({ _id: survey._id });
-    });
+    }
   } catch (error) {
     console.log(error);
   }
 };
 
-export const deleteImages = () => {
+export const deleteImages = async () => {
   const filePath = process.env.ROOT_TO_DIRECTORY;
+
   const files = fs.readdirSync(filePath!);
-  files.forEach(async (file) => {
+
+  for (const file of files) {
     const fullPath = path.join(filePath!, file);
-    const { birthtime } = await fs.promises.stat(fullPath);
-    const presentDate = new Date();
-    const diffTime = Math.abs(presentDate.getTime() - birthtime.getTime());
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    if (diffDays <= 14) fs.promises.unlink(fullPath);
-  });
+
+    try {
+      const { birthtime } = await fs.promises.stat(fullPath);
+      const presentDate = new Date();
+      const diffTime = Math.abs(presentDate.getTime() - birthtime.getTime());
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+      if (diffDays >= 14) {
+        await fs.promises.unlink(fullPath);
+      }
+    } catch (error) {
+      console.error(`Error processing file ${fullPath}:`, error);
+    }
+  }
 };
