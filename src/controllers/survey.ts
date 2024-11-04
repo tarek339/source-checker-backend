@@ -56,20 +56,33 @@ export const createSurvey = async (req: Request, res: Response) => {
 
 export const completeSurvey = async (req: Request, res: Response) => {
   const survey = await Survey.findOne({ surveyId: req.params.surveyId });
+  let newUrl = req.body.page.url;
   try {
+    if (
+      req.body.page.url.startsWith("http://") &&
+      req.body.page.url.includes("www.")
+    ) {
+      newUrl = req.body.page.url.replace("http://", `https://`);
+    }
+    if (
+      req.body.page.url.startsWith("www.") &&
+      !req.body.page.url.startsWith("http://")
+    ) {
+      newUrl = req.body.page.url.replace("www.", `https://www.`);
+    }
     const mobileContent = await captureScreenshot(
       {
         width: 425,
         height: 1000,
       },
-      req.body.page.url
+      newUrl
     );
     const desktopContent = await captureScreenshot(
       {
         width: 1024,
         height: 1300,
       },
-      req.body.page.url
+      newUrl
     );
 
     const mobileScreenshot = uploadImg(
@@ -90,7 +103,7 @@ export const completeSurvey = async (req: Request, res: Response) => {
       process.env.WEB_SERVER_URL! + "/images/"
     );
 
-    const openGraphData = await scrapOpenGraph(req.body.page.url);
+    const openGraphData = await scrapOpenGraph(newUrl);
     req.body.page.openGraph = openGraphData;
 
     survey.pages.push(req.body.page);
@@ -104,7 +117,7 @@ export const completeSurvey = async (req: Request, res: Response) => {
   } catch (error) {
     console.log("TimeoutError: Navigation timeout of 30000 ms exceeded");
     try {
-      const openGraphData = await scrapOpenGraph(req.body.page.url);
+      const openGraphData = await scrapOpenGraph(newUrl);
       req.body.page.openGraph = openGraphData;
       survey.pages.push(req.body.page);
       await survey.save();
