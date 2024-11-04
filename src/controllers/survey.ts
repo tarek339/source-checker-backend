@@ -54,9 +54,67 @@ export const createSurvey = async (req: Request, res: Response) => {
   }
 };
 
+export const editFreeUserNames = async (req: Request, res: Response) => {
+  try {
+    console.log("first");
+    const survey = await Survey.findById(req.params.id);
+    console.log("survey", survey);
+    console.log(req.body.freeUserNames);
+    survey.freeUserNames = req.body.freeUserNames;
+
+    await survey.save();
+
+    res.json({
+      message: "free user names changed",
+      survey: {
+        _id: survey._id,
+        anonymousResults: survey.anonymousResults,
+        freeUserNames: survey.freeUserNames,
+        selectedSurveysOption: survey.selectedSurveysOption,
+        selectedResultsOption: survey.selectedResultsOption,
+        surveyId: survey.surveyId,
+        surveyPin: survey.surveyPin,
+        link: survey.link,
+        surveyNumber: survey.surveyNumber,
+      },
+    });
+  } catch (error) {
+    res.status(422).json({
+      message: mongooseErrorHandler(error as Error),
+    });
+  }
+};
+export const editAnonymousResults = async (req: Request, res: Response) => {
+  try {
+    const survey = await Survey.findById(req.params.id);
+    survey.anonymousResults = req.body.anonymousResults;
+
+    await survey.save();
+
+    res.json({
+      message: "anonymous results changed",
+      survey: {
+        _id: survey._id,
+        anonymousResults: survey.anonymousResults,
+        freeUserNames: survey.freeUserNames,
+        selectedSurveysOption: survey.selectedSurveysOption,
+        selectedResultsOption: survey.selectedResultsOption,
+        surveyId: survey.surveyId,
+        surveyPin: survey.surveyPin,
+        link: survey.link,
+        surveyNumber: survey.surveyNumber,
+      },
+    });
+  } catch (error) {
+    res.status(422).json({
+      message: mongooseErrorHandler(error as Error),
+    });
+  }
+};
+
 export const completeSurvey = async (req: Request, res: Response) => {
-  const survey = await Survey.findOne({ surveyId: req.params.surveyId });
   let newUrl = req.body.page.url;
+  const survey = await Survey.findOne({ surveyId: req.params.surveyId });
   try {
     if (
       req.body.page.url.startsWith("http://") &&

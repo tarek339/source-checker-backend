@@ -5,6 +5,8 @@ import {
   createSurvey,
   deletePage,
   deleteSurvey,
+  editAnonymousResults,
+  editFreeUserNames,
   fetchSurvey,
   getSurveyProfile,
 } from "../controllers/survey";
@@ -25,6 +27,8 @@ router.post("/delete-page/:id", deletePage);
 router.get("/get-profile/:id", getSurveyProfile);
 router.put("/choose-page-view/:id", choosePageView);
 router.put("/set-survey-status/:id", setSurveyStatus);
+router.put("/edit-freeUserNames/:id", editFreeUserNames);
+router.put("/edit-anonymousResults/:id", editAnonymousResults);
 router.post("/push-stars/:id", pushStarsAmount);
 router.post("/set-current-page/:id", setCurrentPage);
 router.get(
