@@ -7,7 +7,7 @@ import {
 } from "../types/interfaces/interfaces";
 import { Survey } from "../models/survey";
 import { captureScreenshot } from "../lib/screenshot";
-// import { uploadImg } from "../lib/upload";
+import { uploadImg } from "../lib/upload";
 import { v4 as uuid } from "uuid";
 import { scrapOpenGraph } from "../lib/scrapOpenGraph";
 import { io } from "../socket";
@@ -143,23 +143,23 @@ export const completeSurvey = async (req: Request, res: Response) => {
       newUrl
     );
 
-    // const mobileScreenshot = uploadImg(
-    //   mobileContent as Buffer,
-    //   uuid() + ".jpg"
-    // );
-    // const desktopScreenshot = uploadImg(
-    //   desktopContent as Buffer,
-    //   uuid() + ".jpg"
-    // );
+    const mobileScreenshot = uploadImg(
+      mobileContent as Buffer,
+      uuid() + ".jpg"
+    );
+    const desktopScreenshot = uploadImg(
+      desktopContent as Buffer,
+      uuid() + ".jpg"
+    );
 
-    // req.body.page.mobileScreenshot = mobileScreenshot.replace(
-    //   process.env.ROOT_TO_DIRECTORY!,
-    //   process.env.WEB_SERVER_URL! + "/images/"
-    // );
-    // req.body.page.desktopScreenshot = desktopScreenshot.replace(
-    //   process.env.ROOT_TO_DIRECTORY!,
-    //   process.env.WEB_SERVER_URL! + "/images/"
-    // );
+    req.body.page.mobileScreenshot = mobileScreenshot.replace(
+      process.env.ROOT_TO_DIRECTORY!,
+      process.env.WEB_SERVER_URL! + "/images/"
+    );
+    req.body.page.desktopScreenshot = desktopScreenshot.replace(
+      process.env.ROOT_TO_DIRECTORY!,
+      process.env.WEB_SERVER_URL! + "/images/"
+    );
 
     const openGraphData = await scrapOpenGraph(newUrl);
     req.body.page.openGraph = openGraphData;
