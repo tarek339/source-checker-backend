@@ -36,7 +36,9 @@ app.get("/", (req, res) => {
 });
 
 async function startServer() {
-  await mongoose.connect(process.env.DB_CONNECT!);
+  await mongoose.connect(
+    "mongodb+srv://tarek:Sony2020@cluster0.ywzi97j.mongodb.net/source-checker?retryWrites=true&w=majority"
+  );
   server.listen(port, () => {
     console.log(`[server]: Server is running at http://localhost:${port}`);
   });
