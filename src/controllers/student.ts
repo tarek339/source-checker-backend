@@ -7,6 +7,8 @@ export const registerUserName = async (req: Request, res: Response) => {
   try {
     const studentExists = await Student.findOne({
       freeUserName: req.body.freeUserName.toLowerCase(),
+      participated: false,
+      surveyId: req.body.surveyId,
     });
     if (studentExists) {
       res.status(401).json({

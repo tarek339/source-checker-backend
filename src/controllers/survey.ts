@@ -3,7 +3,6 @@ import {
   mongooseErrorHandler,
   Error,
   IPages,
-  ISurvey,
 } from "../types/interfaces/interfaces";
 import { Survey } from "../models/survey";
 import { captureScreenshot } from "../lib/screenshot";
@@ -262,9 +261,10 @@ export const deleteSurvey = async (req: Request, res: Response) => {
     });
 
     const students = await Student.find({ surveyId: req.params.id });
-    students.forEach(async (student) => {
+
+    for (const student of students) {
       await Student.deleteOne({ _id: student._id });
-    });
+    }
 
     await Survey.findByIdAndDelete(req.params.id);
 
