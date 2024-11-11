@@ -29,7 +29,7 @@ app.use("/student", student);
 setInterval(() => {
   autoDelete();
   deleteImages();
-}, 1000 * 60 * 60 * 24);
+}, 60 * 60 * 24);
 
 app.get("/", (req, res) => {
   res.send("Backend and DB connected");
