@@ -7,7 +7,7 @@
     "start": "node dist/server.js",
     "dev": "nodemon src/server.ts"
   },
-  "author": "",
+  "author": "Tarek Jassine",
   "license": "MIT",
   "dependencies": {
     "@cliqz/adblocker-puppeteer": "^1.33.2",
@@ -16,7 +16,6 @@
     "cross-fetch": "^4.0.0",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
-    "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.5.1",
     "open-graph-scraper": "^6.7.0",
     "punycode": "^2.3.1",
