@@ -55,10 +55,7 @@ export const createSurvey = async (req: Request, res: Response) => {
 
 export const editFreeUserNames = async (req: Request, res: Response) => {
   try {
-    console.log("first");
     const survey = await Survey.findById(req.params.id);
-    console.log("survey", survey);
-    console.log(req.body.freeUserNames);
     survey.freeUserNames = req.body.freeUserNames;
 
     await survey.save();
@@ -281,6 +278,20 @@ export const deleteSurvey = async (req: Request, res: Response) => {
 export const deletePage = async (req: Request, res: Response) => {
   try {
     const survey = await Survey.findOne({ "pages._id": req.params.id });
+
+    survey?.pages.forEach((page: IPages) => {
+      const filePath = process.env.ROOT_TO_DIRECTORY;
+      const files = fs.readdirSync(filePath!);
+      files.forEach((file) => {
+        const fullPath = path.join(filePath!, file);
+        if (page.mobileScreenshot.includes(file)) {
+          fs.promises.unlink(fullPath);
+        }
+        if (page.desktopScreenshot.includes(file)) {
+          fs.promises.unlink(fullPath);
+        }
+      });
+    });
 
     survey.pages = survey.pages.filter((page: any, i: number) => {
       return page._id != req.params.id;
