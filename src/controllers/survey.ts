@@ -277,7 +277,9 @@ export const deleteSurvey = async (req: Request, res: Response) => {
 
 export const deletePage = async (req: Request, res: Response) => {
   try {
-    const survey = await Survey.findOne({ "pages._id": req.params.id });
+    const ids = req.body.surveyIds;
+
+    const survey = await Survey.findById(req.params.id);
 
     survey?.pages.forEach((page: IPages) => {
       const filePath = process.env.ROOT_TO_DIRECTORY;
@@ -293,8 +295,14 @@ export const deletePage = async (req: Request, res: Response) => {
       });
     });
 
-    survey.pages = survey.pages.filter((page: any, i: number) => {
-      return page._id != req.params.id;
+    survey.pages.map((page: IPages) => {
+      return String(page._id);
+    });
+
+    ids.map((id: string) => id);
+
+    survey.pages = survey.pages.filter((page: IPages) => {
+      return !ids.includes(String(page._id));
     });
 
     survey.pageNum = 1;
