@@ -76,7 +76,7 @@ const surveySchema = new Schema({
         default: "",
       },
       openGraph: {
-        type: JSON,
+        type: Object,
       },
       starsArray: [
         {
