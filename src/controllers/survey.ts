@@ -176,7 +176,12 @@ export const completeSurvey = async (req: Request, res: Response) => {
       survey,
     });
   } catch (error) {
-    console.log("TimeoutError: Navigation timeout of 30000 ms exceeded");
+    res.json({
+      message: `TimeoutError: Navigation timeout of 30000 ms exceeded - ${
+        (error as Error).message
+      } `,
+    });
+
     try {
       const openGraphData = await scrapOpenGraph(newUrl);
       req.body.page.openGraph = openGraphData;
@@ -188,13 +193,10 @@ export const completeSurvey = async (req: Request, res: Response) => {
         survey,
       });
     } catch (error) {
-      console.log(
-        "Unable to create screeshots and open graph data. Please try another website!",
-        error
-      );
       res.status(422).json({
-        message:
-          "Unable to create screeshots and open graph data. Please try another website!",
+        message: `Unable to create screeshots and open graph data. Please try another website! - ${
+          (error as Error).message
+        }`,
       });
     }
   }
@@ -352,9 +354,9 @@ export const deletePage = async (req: Request, res: Response) => {
     res.json({
       message: "page deleted",
     });
-  } catch (err) {
+  } catch (error) {
     res.status(422).json({
-      message: mongooseErrorHandler(err as Error),
+      message: mongooseErrorHandler(error as Error),
     });
   }
 };
@@ -374,6 +376,8 @@ export const getSurveyProfile = async (req: Request, res: Response) => {
     }
     res.json({ survey });
   } catch (error) {
-    console.log(error);
+    res.status(422).json({
+      message: mongooseErrorHandler(error as Error),
+    });
   }
 };

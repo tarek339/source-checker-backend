@@ -19,7 +19,7 @@ export const clearCookies = async (page: Page) => {
     // Cookies have been cleared successfully
     return true;
   } catch (error) {
-    console.error("Error clearing cookies:", error);
+    console.error("Error clearing cookies:", (error as Error).message);
     return false;
   }
 };
