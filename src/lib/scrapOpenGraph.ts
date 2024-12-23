@@ -7,6 +7,6 @@ export const scrapOpenGraph = async (url: string) => {
     const { result } = data;
     return result;
   } catch (error) {
-    console.log(error);
+    console.error(`Error scraping open graph data ${(error as Error).message}`);
   }
 };

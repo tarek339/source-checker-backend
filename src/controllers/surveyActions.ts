@@ -23,7 +23,7 @@ export const autoDelete = async () => {
       await Survey.deleteOne({ _id: survey._id });
     }
   } catch (error) {
-    console.log(error);
+    console.error(`Autodelete error - ${(error as Error).message}`);
   }
 };
 
@@ -45,7 +45,10 @@ export const deleteImages = async () => {
         await fs.promises.unlink(fullPath);
       }
     } catch (error) {
-      console.error(`Error processing file ${fullPath}:`, error);
+      console.error(
+        `Error processing file ${fullPath}:`,
+        (error as Error).message
+      );
     }
   }
 };
