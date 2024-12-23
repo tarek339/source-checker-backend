@@ -162,6 +162,13 @@ export const completeSurvey = async (req: Request, res: Response) => {
 
     survey.pages.push(req.body.page);
 
+    survey.pages = survey.pages.map((page: IPages[], i: number) => {
+      return {
+        number: i + 1,
+        ...page,
+      };
+    });
+
     await survey.save();
 
     res.json({
@@ -281,18 +288,44 @@ export const deletePage = async (req: Request, res: Response) => {
 
     const survey = await Survey.findById(req.params.id);
 
-    survey?.pages.forEach((page: IPages) => {
+    survey.pages.forEach((page: IPages) => {
       const filePath = process.env.ROOT_TO_DIRECTORY;
       const files = fs.readdirSync(filePath!);
-      files.forEach((file) => {
-        const fullPath = path.join(filePath!, file);
-        if (page.mobileScreenshot.includes(file)) {
-          fs.promises.unlink(fullPath);
+
+      // Convert files array to a Set for O(1) lookups
+      const filesSet = new Set(files);
+
+      const desktopScreenshot = page.desktopScreenshot.replace(
+        `${process.env.WEB_SERVER_URL!}/images/`,
+        ""
+      );
+      const mobileScreenshot = page.mobileScreenshot.replace(
+        `${process.env.WEB_SERVER_URL!}/images/`,
+        ""
+      );
+
+      // Check if the page ID matches any in the ids array
+      if (ids.includes(String(page._id))) {
+        // Delete the mobile screenshot if it exists in the files
+        if (filesSet.has(mobileScreenshot)) {
+          const mobilePath = path.join(filePath!, mobileScreenshot);
+          fs.promises
+            .unlink(mobilePath)
+            .catch((err) =>
+              console.error(`Error deleting file: ${mobilePath}`, err)
+            );
         }
-        if (page.desktopScreenshot.includes(file)) {
-          fs.promises.unlink(fullPath);
+
+        // Delete the desktop screenshot if it exists in the files
+        if (filesSet.has(desktopScreenshot)) {
+          const desktopPath = path.join(filePath!, desktopScreenshot);
+          fs.promises
+            .unlink(desktopPath)
+            .catch((err) =>
+              console.error(`Error deleting file: ${desktopPath}`, err)
+            );
         }
-      });
+      }
     });
 
     survey.pages.map((page: IPages) => {
@@ -306,6 +339,13 @@ export const deletePage = async (req: Request, res: Response) => {
     });
 
     survey.pageNum = 1;
+
+    survey.pages = survey.pages.map((page: IPages[], i: number) => {
+      return {
+        number: i + 1,
+        ...page,
+      };
+    });
 
     await survey.save();
 
