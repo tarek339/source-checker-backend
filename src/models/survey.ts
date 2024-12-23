@@ -46,6 +46,10 @@ const surveySchema = new Schema({
   },
   pages: [
     {
+      number: {
+        type: Number,
+        default: null,
+      },
       title: {
         type: String,
       },

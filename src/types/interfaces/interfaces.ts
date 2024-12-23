@@ -15,6 +15,7 @@ export const mongooseErrorHandler = (error: Error) => {
 
 export interface IPages {
   _id: string;
+  number?: number;
   title: string;
   url: string;
   note: string;
