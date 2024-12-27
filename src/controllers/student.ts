@@ -2,8 +2,10 @@ import { Request, Response } from "express";
 import { Student } from "../models/student";
 import { mongooseErrorHandler, Error } from "../types/interfaces/interfaces";
 import { Survey } from "../models/survey";
+import jwt from "jsonwebtoken";
+import { io } from "../socket";
 
-export const registerUserName = async (req: Request, res: Response) => {
+export const registerStudent = async (req: Request, res: Response) => {
   try {
     const studentExists = await Student.findOne({
       freeUserName: req.body.freeUserName.toLowerCase(),
@@ -27,9 +29,19 @@ export const registerUserName = async (req: Request, res: Response) => {
       isNameRegistered: true,
     });
 
+    const token = jwt.sign(
+      {
+        studentId: student._id,
+      },
+      process.env.SECRET_TOKEN!,
+      {
+        expiresIn: "7d",
+      }
+    );
+
     await student.save();
 
-    res.json({ message: "user name created", student });
+    res.json({ message: "user name created", student, token });
   } catch (error) {
     res.status(422).json({
       message: mongooseErrorHandler(error as Error),
@@ -39,7 +51,7 @@ export const registerUserName = async (req: Request, res: Response) => {
 
 export const fetchSingleStudent = async (req: Request, res: Response) => {
   try {
-    const student = await Student.findById(req.params.studentId);
+    const student = await Student.findById(req.body.studentId);
 
     res.json({ student });
   } catch (error) {
@@ -63,7 +75,9 @@ export const fetchStudents = async (req: Request, res: Response) => {
 
 export const fetchStudentSurvey = async (req: Request, res: Response) => {
   try {
-    const survey = await Survey.findOne({ surveyId: req.body.surveyId });
+    const survey = await Survey.findOne({ surveyId: req.body.surveyId }).select(
+      "-surveyPin"
+    );
 
     if (!survey) {
       res.status(401).json({
@@ -71,6 +85,47 @@ export const fetchStudentSurvey = async (req: Request, res: Response) => {
       });
       return;
     }
+
+    res.json({
+      survey,
+    });
+  } catch (error) {
+    res.status(422).json({
+      message: mongooseErrorHandler(error as Error),
+    });
+  }
+};
+
+export const fetchStudentSurveyByToken = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const student = await Student.findOne({ _id: req.body.studentId });
+    const survey = await Survey.findById(student.surveyId).select("-surveyPin");
+    if (survey) {
+      io?.emit("surveyStatusChanged", {
+        surveyId: survey._id,
+        isStarted: survey.isStarted,
+      });
+      io?.emit("surveyPageNumber", {
+        surveyId: survey._id,
+        pageNum: survey.pageNum,
+      });
+    }
+    res.json({
+      survey,
+    });
+  } catch (error) {
+    res.status(422).json({
+      message: mongooseErrorHandler(error as Error),
+    });
+  }
+};
+
+export const fetchStudentSurveyById = async (req: Request, res: Response) => {
+  try {
+    const survey = await Survey.findById(req.params.id).select("-surveyPin");
 
     res.json({
       survey,
