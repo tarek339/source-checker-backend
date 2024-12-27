@@ -13,6 +13,7 @@ import { io } from "../socket";
 import { Student } from "../models/student";
 import fs from "fs";
 import path from "path";
+import jwt from "jsonwebtoken";
 require("dotenv").config();
 
 export const createSurvey = async (req: Request, res: Response) => {
@@ -30,6 +31,17 @@ export const createSurvey = async (req: Request, res: Response) => {
 
     await Survey.findById(survey._id);
     survey.link = `${process.env.WEB_SERVER_URL}/register-student/${survey._id}`;
+
+    const token = jwt.sign(
+      {
+        surveyID: survey._id,
+      },
+      process.env.SECRET_TOKEN!,
+      {
+        expiresIn: "7d",
+      }
+    );
+
     await survey.save();
 
     res.json({
@@ -45,6 +57,7 @@ export const createSurvey = async (req: Request, res: Response) => {
         link: survey.link,
         surveyNumber: survey.surveyNumber,
       },
+      token,
     });
   } catch (error) {
     res.status(422).json({
@@ -62,17 +75,7 @@ export const editFreeUserNames = async (req: Request, res: Response) => {
 
     res.json({
       message: "free user names changed",
-      survey: {
-        _id: survey._id,
-        anonymousResults: survey.anonymousResults,
-        freeUserNames: survey.freeUserNames,
-        selectedSurveysOption: survey.selectedSurveysOption,
-        selectedResultsOption: survey.selectedResultsOption,
-        surveyId: survey.surveyId,
-        surveyPin: survey.surveyPin,
-        link: survey.link,
-        surveyNumber: survey.surveyNumber,
-      },
+      survey,
     });
   } catch (error) {
     res.status(422).json({
@@ -89,17 +92,7 @@ export const editAnonymousResults = async (req: Request, res: Response) => {
 
     res.json({
       message: "anonymous results changed",
-      survey: {
-        _id: survey._id,
-        anonymousResults: survey.anonymousResults,
-        freeUserNames: survey.freeUserNames,
-        selectedSurveysOption: survey.selectedSurveysOption,
-        selectedResultsOption: survey.selectedResultsOption,
-        surveyId: survey.surveyId,
-        surveyPin: survey.surveyPin,
-        link: survey.link,
-        surveyNumber: survey.surveyNumber,
-      },
+      survey,
     });
   } catch (error) {
     res.status(422).json({
@@ -108,7 +101,7 @@ export const editAnonymousResults = async (req: Request, res: Response) => {
   }
 };
 
-export const completeSurvey = async (req: Request, res: Response) => {
+export const addSurveyPage = async (req: Request, res: Response) => {
   let newUrl = req.body.page.url;
   const survey = await Survey.findOne({ surveyId: req.params.surveyId });
   try {
@@ -202,7 +195,7 @@ export const completeSurvey = async (req: Request, res: Response) => {
   }
 };
 
-export const choosePageView = async (req: Request, res: Response) => {
+export const selectPageView = async (req: Request, res: Response) => {
   try {
     const survey = await Survey.findById(req.params.id);
 
@@ -224,7 +217,7 @@ export const choosePageView = async (req: Request, res: Response) => {
   }
 };
 
-export const fetchSurvey = async (req: Request, res: Response) => {
+export const logInSurvey = async (req: Request, res: Response) => {
   try {
     const survey = await Survey.findOne({
       surveyId: req.body.surveyId,
@@ -238,8 +231,19 @@ export const fetchSurvey = async (req: Request, res: Response) => {
       return;
     }
 
+    const token = jwt.sign(
+      {
+        surveyID: survey._id,
+      },
+      process.env.SECRET_TOKEN!,
+      {
+        expiresIn: "7d",
+      }
+    );
+
     res.json({
       survey,
+      token,
     });
   } catch (error) {
     res.status(422).json({
@@ -363,17 +367,17 @@ export const deletePage = async (req: Request, res: Response) => {
 
 export const getSurveyProfile = async (req: Request, res: Response) => {
   try {
-    const survey = await Survey.findById(req.params.id);
-    if (survey) {
-      io?.emit("surveyStatusChanged", {
-        surveyId: survey._id,
-        isStarted: survey.isStarted,
-      });
-      io?.emit("surveyPageNumber", {
-        surveyId: survey._id,
-        pageNum: survey.pageNum,
-      });
-    }
+    const survey = await Survey.findById(req.body.surveyID);
+    // if (survey) {
+    //   io?.emit("surveyStatusChanged", {
+    //     surveyId: survey._id,
+    //     isStarted: survey.isStarted,
+    //   });
+    //   io?.emit("surveyPageNumber", {
+    //     surveyId: survey._id,
+    //     pageNum: survey.pageNum,
+    //   });
+    // }
     res.json({ survey });
   } catch (error) {
     res.status(422).json({
