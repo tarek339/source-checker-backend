@@ -4,7 +4,7 @@ import mongoose from "mongoose";
 import cors from "cors";
 import { router as survey } from "./routes/survey";
 import { router as student } from "./routes/student";
-import { autoDelete, deleteImages } from "./controllers/surveyActions";
+import { autoDeleteSurvey, deleteImages } from "./lib/autoDeleteSurvey";
 import { Server } from "socket.io";
 import http from "http";
 import { setIO, setSocket } from "./socket";
@@ -27,7 +27,7 @@ app.use("/survey", survey);
 app.use("/student", student);
 
 setInterval(() => {
-  autoDelete();
+  autoDeleteSurvey();
   deleteImages();
 }, 60 * 60 * 24);
 

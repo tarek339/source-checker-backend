@@ -3,7 +3,7 @@ import { Student } from "../models/student";
 import { Survey } from "../models/survey";
 import fs from "fs";
 
-export const autoDelete = async () => {
+export const autoDeleteSurvey = async () => {
   try {
     const surveys = await Survey.find();
     const presentDate = new Date().toLocaleDateString();
@@ -23,7 +23,7 @@ export const autoDelete = async () => {
       await Survey.deleteOne({ _id: survey._id });
     }
   } catch (error) {
-    console.error(`Autodelete error - ${(error as Error).message}`);
+    console.error(`auto delete survey - ${(error as Error).message}`);
   }
 };
 
