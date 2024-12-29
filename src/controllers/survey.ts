@@ -37,7 +37,7 @@ export const createNewSurvey = async (req: Request, res: Response) => {
       },
       process.env.SECRET_TOKEN!,
       {
-        expiresIn: "7d",
+        expiresIn: "1d",
       }
     );
 
@@ -236,7 +236,7 @@ export const logInSurvey = async (req: Request, res: Response) => {
       },
       process.env.SECRET_TOKEN!,
       {
-        expiresIn: "7d",
+        expiresIn: "1d",
       }
     );
 

@@ -35,7 +35,7 @@ export const registerStudent = async (req: Request, res: Response) => {
       },
       process.env.SECRET_TOKEN!,
       {
-        expiresIn: "7d",
+        expiresIn: "1d",
       }
     );
 
