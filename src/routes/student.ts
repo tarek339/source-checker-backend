@@ -12,7 +12,7 @@ import { withAdmin } from "../middleware/withAdmin";
 
 export const router = express.Router();
 
-router.post("/register-free-user-name", registerStudent);
+router.post("/register-student", registerStudent);
 router.get("/fetch-students/:id", withAdmin, fetchStudents);
 router.get("/fetch-single-student", withStudent, fetchSingleStudent);
 router.get("/fetch-students-survey", withStudent, fetchStudentSurveyByToken);

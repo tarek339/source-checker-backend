@@ -9,14 +9,13 @@ import { captureScreenshot } from "../lib/screenshot";
 import { uploadImg } from "../lib/upload";
 import { v4 as uuid } from "uuid";
 import { scrapOpenGraph } from "../lib/scrapOpenGraph";
-import { io } from "../socket";
 import { Student } from "../models/student";
 import fs from "fs";
 import path from "path";
 import jwt from "jsonwebtoken";
 require("dotenv").config();
 
-export const createSurvey = async (req: Request, res: Response) => {
+export const createNewSurvey = async (req: Request, res: Response) => {
   try {
     const survey = new Survey({
       anonymousResults: req.body.anonymousResults,
@@ -288,7 +287,7 @@ export const deleteSurvey = async (req: Request, res: Response) => {
   }
 };
 
-export const deletePage = async (req: Request, res: Response) => {
+export const deleteSurveyPage = async (req: Request, res: Response) => {
   try {
     const ids = req.body.surveyIds;
 
@@ -368,16 +367,6 @@ export const deletePage = async (req: Request, res: Response) => {
 export const getSurveyProfile = async (req: Request, res: Response) => {
   try {
     const survey = await Survey.findById(req.body.surveyID);
-    // if (survey) {
-    //   io?.emit("surveyStatusChanged", {
-    //     surveyId: survey._id,
-    //     isStarted: survey.isStarted,
-    //   });
-    //   io?.emit("surveyPageNumber", {
-    //     surveyId: survey._id,
-    //     pageNum: survey.pageNum,
-    //   });
-    // }
     res.json({ survey });
   } catch (error) {
     res.status(422).json({
