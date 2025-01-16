@@ -218,6 +218,24 @@ export const selectPageView = async (req: Request, res: Response) => {
 
 export const logInSurvey = async (req: Request, res: Response) => {
   try {
+    if (!req.body.surveyId || !req.body.surveyPin) {
+      res.status(401).json({
+        errorMessage: "Pflichtfeld",
+      });
+      return;
+    }
+    if (req.body.surveyId.match(/[A-Z|a-z|ü|é]/i)) {
+      res.status(401).json({
+        errorMessage: "Ungültige Eingabe - nur Zahlen erlaubt",
+      });
+      return;
+    }
+    if (req.body.surveyPin.match(/[A-Z|a-z|ü|é]/i)) {
+      res.status(401).json({
+        errorMessage: "Ungültige Eingabe - nur Zahlen erlaubt",
+      });
+      return;
+    }
     const survey = await Survey.findOne({
       surveyId: req.body.surveyId,
       surveyPin: req.body.surveyPin,
@@ -225,7 +243,7 @@ export const logInSurvey = async (req: Request, res: Response) => {
 
     if (!survey) {
       res.status(401).json({
-        errorMessage: "Wrong ID or PIN",
+        errorMessage: "Falsche ID oder PIN",
       });
       return;
     }
