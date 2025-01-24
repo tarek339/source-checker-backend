@@ -15,38 +15,40 @@
 ## Entwicklungsmodus
 
 1. Installieren Sie die erforderlichen Abhängigkeiten:
-    ``` 
-    npm install
-    ```
+   ```
+   npm install
+   ```
 2. Starten Sie den Entwicklungsserver:
-    ```
-    npm run dev
-    ```
+   ```
+   npm run dev
+   ```
 3. Erstellen Sie eine .env-Datei im Root-Verzeichnis des Projekts.
 4. Fügen Sie die folgenden Variablen und deren Werte hinzu:
-    ```
-    PORT=4000
-    DB_CONNECT="Verbindung zur Datenbank"
-    WEB_SERVER_URL=http://localhost:5173
-    ROOT_TO_DIRECTORY=/Pfad/zum/Ordner (zum Speichern der Screenshots)
-    ```
+   ```
+   PORT=4000
+   DB_CONNECT="Verbindung zur Datenbank"
+   WEB_SERVER_URL=http://localhost:5173
+   ROOT_TO_DIRECTORY=/Pfad/zum/Ordner (zum Speichern der Screenshots)
+   SECRET_TOKEN="dein secret token"
+   ```
+
 ## Produktionsmodus
 
 Um das Projekt für die Produktion zu erstellen und zu starten, folgen Sie diesen Schritten:
 
 1. Erstellen Sie die Produktionsversion:
-    ```
-    npm run build
-    ```
+   ```
+   npm run build
+   ```
 2. Navigieren Sie in das dist-Verzeichnis:
-    ```
-    cd dist
-    ```
+   ```
+   cd dist
+   ```
 3. Starten Sie das Produktions-Server:
-    ```
-    npm start
-    ```
-    
+   ```
+   npm start
+   ```
+
 ## Hinweis
 
 Stellen Sie sicher, dass Sie Node.js und npm installiert haben, um die oben genannten Befehle ausführen zu können. Weitere Informationen finden Sie in der offiziellen [Node.js-Dokumentation](https://nodejs.org/en/).
