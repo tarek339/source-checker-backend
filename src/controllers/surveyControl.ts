@@ -3,6 +3,7 @@ import {
   mongooseErrorHandler,
   Error,
   IPages,
+  StudentStars,
 } from "../types/interfaces/interfaces";
 import { Survey } from "../models/survey";
 import { io } from "../socket";
@@ -42,11 +43,101 @@ export const setSurveyStatus = async (req: Request, res: Response) => {
       });
     }
 
-    survey.pages.map((page: IPages) => {
-      if (page.starsArray.length > 0 && survey.isStarted) {
-        page.starsArray = [];
-      }
-    });
+    // to add summary of student who did not participate
+    if (!survey.isStarted) {
+      const findStudent = await Student.find({
+        surveyId: req.params.id,
+        participated: false,
+        stars: 0,
+      });
+
+      findStudent.forEach((student) => {
+        survey.pages.forEach((page: IPages) => {
+          page.starsArray.push({
+            studentId: student._id,
+            userName: student.freeUserName,
+            userNumber: student.userNumber,
+            stars: 0,
+            participated: true,
+          });
+        });
+      });
+
+      findStudent.forEach((student) => {
+        student.participated = true;
+        student.save();
+      });
+    }
+
+    if (!survey.isStarted) {
+      // Check starsArray if it has student values
+      survey.pages.forEach((page: IPages, pageIndex: number) => {
+        if (page.starsArray.length === 0 && pageIndex > 0) {
+          // If the page has no student values and it's not the first page, add the student values from the first page
+          survey.pages[0].starsArray.forEach(
+            (student: {
+              studentId: string;
+              userName: string;
+              userNumber: string;
+            }) => {
+              page.starsArray.push({
+                studentId: student.studentId,
+                userName: student.userName,
+                userNumber: student.userNumber,
+                stars: 0,
+                participated: true,
+              });
+            }
+          );
+        }
+      });
+    }
+
+    if (!survey.isStarted) {
+      ensureEqualStarsArrayLength(survey.pages);
+    }
+
+    function ensureEqualStarsArrayLength(pages: IPages[]) {
+      const studentMap: { [key: string]: any } = {};
+
+      // Collect all unique studentIds and their corresponding objects
+      pages.forEach((page) => {
+        page.starsArray.forEach((student: StudentStars) => {
+          if (!studentMap[student.studentId]) {
+            studentMap[student.studentId] = {
+              studentId: student.studentId,
+              userName: student.userName,
+              userNumber: student.userNumber,
+              stars: 0,
+              participated: true,
+            };
+          }
+        });
+      });
+
+      // Ensure all pages have the same length and contain the same objects
+      pages.forEach((page) => {
+        const existingStudentIds = page.starsArray.map(
+          (student: StudentStars) => student.studentId
+        );
+        const missingStudents = Object.keys(studentMap).filter(
+          (studentId) => !existingStudentIds.includes(studentId)
+        );
+
+        missingStudents.forEach((studentId) => {
+          page.starsArray.push({ ...studentMap[studentId] });
+        });
+      });
+    }
+
+    // to delete the previous starsArray
+    if (survey.isStarted) {
+      survey.pages.forEach((page: IPages) => {
+        page.starsArray = page.starsArray.filter(
+          (obj) => obj.participated !== true
+        );
+      });
+    }
 
     await survey.save();
 
@@ -102,6 +193,7 @@ export const pushStarsAmount = async (req: Request, res: Response) => {
             userName: student.freeUserName,
             userNumber: student.userNumber,
             stars: req.body.stars,
+            participated: true,
           });
         }
       }

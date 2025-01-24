@@ -96,6 +96,10 @@ const surveySchema = new Schema({
           stars: {
             type: Number,
           },
+          participated: {
+            type: Boolean,
+            default: false,
+          },
         },
       ],
     },

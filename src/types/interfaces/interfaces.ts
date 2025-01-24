@@ -25,16 +25,15 @@ export interface IPages {
   isOpenGraphView: boolean;
   mobileScreenshot: string;
   desktopScreenshot: string;
-  starsArray:
-    | [
-        {
-          studentId: string;
-          userName: string;
-          userNumber: string;
-          stars: number;
-        }
-      ]
-    | any[];
+  starsArray: StudentStars[];
+}
+
+export interface StudentStars {
+  studentId: string;
+  userName: string;
+  userNumber: string;
+  stars: number;
+  participated: boolean;
 }
 
 export interface ISurvey {
