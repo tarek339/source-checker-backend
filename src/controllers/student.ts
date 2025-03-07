@@ -82,12 +82,6 @@ export const fetchStudentSurvey = async (req: Request, res: Response) => {
       });
       return;
     }
-    if (!req.body.surveyId.match(/[A-Z|a-z|ü|é]/i)) {
-      res.status(401).json({
-        errorMessage: "Ungültige Eingabe - nur Zahlen erlaubt",
-      });
-      return;
-    }
 
     const survey = await Survey.findOne({ surveyId: req.body.surveyId }).select(
       "-surveyPin"
@@ -95,7 +89,7 @@ export const fetchStudentSurvey = async (req: Request, res: Response) => {
 
     if (!survey) {
       res.status(401).json({
-        errorMessage: "Fehlerhafte ID",
+        errorMessage: "Umfage nicht gefunden",
       });
       return;
     }
